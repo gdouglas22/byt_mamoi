@@ -1,9 +1,8 @@
 import { useNavigate } from 'react-router-dom'
-import { Shell, TabBar, Stars, LoadingScreen } from '../components/Shell'
-import { IcShield, IcFire, IcKey, IcSpark, IcStar, IcMedal, IcSettings, IcArrowL } from '../icons'
+import { Shell, TabBar, TopicIcon, LoadingScreen } from '../components/Shell'
+import { IcShield, IcStar, IcMedal, IcSettings, IcArrowL, IcLock, IcCheck, IcPlay } from '../icons'
 import { useApi } from '../hooks/useApi'
-import { getMe, getAchievements } from '../api'
-import { TOPIC_ICONS } from '../icons'
+import { getMe, getAchievements, getTopics } from '../api'
 
 const WEEK_DAYS = ['П', 'В', 'С', 'Ч', 'П', 'С', 'В']
 
@@ -11,11 +10,21 @@ export default function Profile() {
   const navigate = useNavigate()
   const { data: user, loading: lu } = useApi(getMe)
   const { data: achievements, loading: la } = useApi(getAchievements)
+  const { data: topics, loading: lt } = useApi(getTopics)
 
-  if (lu || la) return <LoadingScreen />
+  if (lu || la || lt) return <LoadingScreen />
 
   const earned = (achievements || []).filter(a => a.earned)
-  const preview = (achievements || []).slice(0, 4)
+
+  // Compute topic statuses: completed → current → locked.
+  // The first not-completed topic in order becomes "current"; everything after is locked.
+  const orderedTopics = topics || []
+  const currentIdx = orderedTopics.findIndex(t => t.games_done < t.games_total)
+  const topicStatus = (idx, t) => {
+    if (t.games_total > 0 && t.games_done >= t.games_total) return 'done'
+    if (idx === currentIdx) return 'current'
+    return 'locked'
+  }
 
   // Mock activity bars (0-100%)
   const activity = [35, 60, 0, 80, 95, 40, 25]
@@ -72,22 +81,65 @@ export default function Profile() {
           <div className="bar"><i style={{ width: `${levelPct}%` }} /></div>
         </div>
 
-        {/* Badges preview */}
+        {/* Topics path: completed → current → locked */}
         <div className="row between" style={{ marginTop: 16, marginBottom: 8, alignItems: 'baseline' }}>
-          <div className="eyebrow">Достижения</div>
-          <span className="linklike tiny" onClick={() => navigate('/achievements')}>
-            Все {achievements?.length || 0} →
+          <div className="eyebrow">Твой путь</div>
+          <span className="muted tiny" style={{ fontWeight: 700 }}>
+            {orderedTopics.filter(t => t.games_total > 0 && t.games_done >= t.games_total).length} / {orderedTopics.length}
           </span>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
-          {preview.map((a, i) => (
-            <div key={i} className={`badge${!a.earned ? ' locked' : ''}`}>
-              <div className={`badge-art ${a.tone}`}>
-                {(() => { const Ic = TOPIC_ICONS[a.icon] || IcStar; return <Ic /> })()}
+        <div className="col" style={{ gap: 8 }}>
+          {orderedTopics.map((t, i) => {
+            const status = topicStatus(i, t)
+            const locked = status === 'locked'
+            const done = status === 'done'
+            const current = status === 'current'
+            const pct = t.games_total > 0 ? Math.round(t.games_done / t.games_total * 100) : 0
+            return (
+              <div
+                key={t.id}
+                className="card"
+                onClick={() => { if (!locked) navigate(`/topic/${t.id}`) }}
+                style={{
+                  padding: 12,
+                  display: 'flex', alignItems: 'center', gap: 12,
+                  cursor: locked ? 'default' : 'pointer',
+                  opacity: locked ? 0.5 : 1,
+                  border: current ? '2px solid var(--honey-deep, #D9A93A)' : undefined,
+                }}
+              >
+                <TopicIcon icon={t.icon} tone={t.tone} />
+                <div className="col" style={{ gap: 4, flex: 1, minWidth: 0 }}>
+                  <div className="row between" style={{ gap: 8 }}>
+                    <div style={{ fontWeight: 800, fontSize: 14 }}>{t.title}</div>
+                    {done && (
+                      <span style={{
+                        width: 22, height: 22, borderRadius: '50%',
+                        background: '#9FD8C7', color: '#fff',
+                        display: 'grid', placeItems: 'center', flexShrink: 0,
+                      }}>
+                        <IcCheck size={14} />
+                      </span>
+                    )}
+                    {current && (
+                      <span className="chip" style={{ background: '#FCEFC9', color: '#8A6915', fontWeight: 800 }}>
+                        <IcPlay size={10} /> сейчас
+                      </span>
+                    )}
+                    {locked && (
+                      <span style={{ color: 'var(--ink-4)', display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+                        <IcLock size={16} />
+                      </span>
+                    )}
+                  </div>
+                  <div className="bar" style={{ height: 5 }}>
+                    <i style={{ width: `${pct}%` }} />
+                  </div>
+                  <div className="meta tiny">{t.games_done}/{t.games_total} игр</div>
+                </div>
               </div>
-              <div className="badge-name">{a.name}</div>
-            </div>
-          ))}
+            )
+          })}
         </div>
 
         {/* Activity chart */}

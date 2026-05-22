@@ -78,35 +78,45 @@ export default function MainMenu() {
           </div>
         </div>
 
-        {/* Daily challenge */}
-        {topics?.[0] && (
-          <div style={{ marginTop: 14 }}>
-            <div style={{
-              borderRadius: 24, padding: 18,
-              background: 'linear-gradient(135deg, #FCEFC9, #FCE4A0)',
-              color: '#5C420C',
-              display: 'flex', gap: 14, alignItems: 'center',
-              cursor: 'pointer',
-            }} onClick={() => navigate(`/topic/${topics[0].id}`)}>
+        {/* Current topic — first started-but-not-finished, else first not-finished */}
+        {(() => {
+          const list = topics || []
+          const inProgress = list.find(t => t.games_done > 0 && t.games_done < t.games_total)
+          const notDone = list.find(t => t.games_done < t.games_total)
+          const current = inProgress || notDone
+          if (!current) return null
+          const isFresh = current.games_done === 0
+          return (
+            <div style={{ marginTop: 14 }}>
               <div style={{
-                width: 56, height: 56, borderRadius: 18,
-                background: '#fff', color: '#D9A93A',
-                display: 'grid', placeItems: 'center', flexShrink: 0,
-              }}>
-                <IcBolt size={32} />
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div className="eyebrow" style={{ color: '#8A6915' }}>Задание дня</div>
-                <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 16, marginTop: 2 }}>
-                  {topics[0].title}
+                borderRadius: 24, padding: 18,
+                background: 'linear-gradient(135deg, #FCEFC9, #FCE4A0)',
+                color: '#5C420C',
+                display: 'flex', gap: 14, alignItems: 'center',
+                cursor: 'pointer',
+              }} onClick={() => navigate(`/topic/${current.id}`)}>
+                <div style={{
+                  width: 56, height: 56, borderRadius: 18,
+                  background: '#fff', color: '#D9A93A',
+                  display: 'grid', placeItems: 'center', flexShrink: 0,
+                }}>
+                  <IcBolt size={32} />
                 </div>
-                <div style={{ fontSize: 12, marginTop: 4, opacity: .8 }}>
-                  {topics[0].games_done}/{topics[0].games_total} игр · продолжить
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="eyebrow" style={{ color: '#8A6915' }}>
+                    {isFresh ? 'Следующая тема' : 'Продолжить'}
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 16, marginTop: 2 }}>
+                    {current.title}
+                  </div>
+                  <div style={{ fontSize: 12, marginTop: 4, opacity: .8 }}>
+                    {current.games_done}/{current.games_total} игр · {isFresh ? 'начать' : 'продолжить'}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )
+        })()}
 
         <div className="row between" style={{ margin: '16px 0 10px' }}>
           <div className="h3">Темы</div>
