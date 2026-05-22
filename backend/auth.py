@@ -15,9 +15,19 @@ import urllib.parse
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, Request, status
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import settings
+from database import get_db
+from models import ApiKey, User
 from schemas import TelegramUser
+
+API_KEY_PREFIX = "bm_"
+
+
+def hash_api_key(raw: str) -> str:
+    return hashlib.sha256(raw.encode()).hexdigest()
 
 
 def _validate_init_data(init_data: str) -> dict:
@@ -47,13 +57,42 @@ def _validate_init_data(init_data: str) -> dict:
     return parsed
 
 
-def get_telegram_user(request: Request) -> TelegramUser:
-    """
-    FastAPI dependency. Accepts  Authorization: tma <initData>
-    (the Telegram Mini App scheme) as well as  Authorization: Bearer <initData>.
+async def _resolve_api_key(token: str, db: AsyncSession) -> TelegramUser:
+    key = await db.scalar(
+        select(ApiKey).where(ApiKey.key_hash == hash_api_key(token))
+    )
+    if key is None or key.revoked:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or revoked API key",
+        )
+    user = await db.get(User, key.user_id)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="API key references missing user",
+        )
+    from datetime import datetime, timezone
+    key.last_used_at = datetime.now(timezone.utc).replace(tzinfo=None)
+    await db.commit()
+    return TelegramUser(
+        id=user.telegram_id,
+        first_name=user.name or "API",
+        username=user.username,
+    )
 
-    In DEBUG mode the token may be a raw JSON user object:
-      Authorization: tma {"id":123,"first_name":"Test"}
+
+async def get_telegram_user(
+    request: Request,
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> TelegramUser:
+    """
+    FastAPI dependency. Accepts three auth schemes:
+      - Authorization: tma <initData>             — Telegram Mini App signature
+      - Authorization: Bearer <initData>          — same, alt scheme
+      - Authorization: Bearer bm_<api_key>        — long-lived dev API key
+
+    In DEBUG mode initData may be a raw JSON user object.
     """
     auth_header = request.headers.get("Authorization", "")
     parts = auth_header.split(" ", 1)
@@ -63,6 +102,9 @@ def get_telegram_user(request: Request) -> TelegramUser:
             detail="Missing or invalid Authorization header",
         )
     token = parts[1]
+
+    if token.startswith(API_KEY_PREFIX):
+        return await _resolve_api_key(token, db)
 
     if settings.DEBUG:
         try:

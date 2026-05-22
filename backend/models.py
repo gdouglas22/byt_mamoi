@@ -180,6 +180,21 @@ class LinkCode(Base):
     child: Mapped["User"] = relationship(back_populates="link_codes", foreign_keys=[child_id])
 
 
+# ── API Keys ───────────────────────────────────────────────────────────────
+class ApiKey(Base):
+    """Long-lived API token for external developers."""
+
+    __tablename__ = "api_keys"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    key_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True, nullable=False)
+    name: Mapped[str] = mapped_column(String(64), default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc)
+    last_used_at: Mapped[datetime | None] = mapped_column(DateTime)
+    revoked: Mapped[bool] = mapped_column(Boolean, default=False)
+
+
 # ── Notifications ──────────────────────────────────────────────────────────
 class Notification(Base):
     __tablename__ = "notifications"

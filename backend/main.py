@@ -10,7 +10,7 @@ from fastapi.staticfiles import StaticFiles
 
 from config import settings
 from database import init_db
-from routers import achievements, notifications, parent, topics, users
+from routers import achievements, admin, notifications, parent, topics, users
 from seed import run_seed
 from database import SessionLocal
 
@@ -45,6 +45,7 @@ app.include_router(topics.router, prefix="/api")
 app.include_router(achievements.router, prefix="/api")
 app.include_router(parent.router, prefix="/api")
 app.include_router(notifications.router, prefix="/api")
+app.include_router(admin.router)  # no /api prefix — admin lives at /admin/*
 
 
 @app.get("/health")

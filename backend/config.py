@@ -17,5 +17,8 @@ class Settings(BaseSettings):
     # In development set to True to skip Telegram signature verification
     DEBUG: bool = False
 
+    # Secret for /admin endpoints (API key management). Empty disables them.
+    ADMIN_SECRET: str = ""
+
 
 settings = Settings()
