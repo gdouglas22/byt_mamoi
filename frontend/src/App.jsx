@@ -6,6 +6,7 @@ import { LoadingScreen } from './components/Shell'
 
 import Onboarding from './screens/Onboarding'
 import MainMenu from './screens/MainMenu'
+import Topics from './screens/Topics'
 import TopicScreen from './screens/TopicScreen'
 import { GameLaunch, GamePlay, GameFinish } from './screens/GameScreens'
 import Profile from './screens/Profile'
@@ -46,6 +47,7 @@ export default function App() {
         <Route path="/" element={<Navigate to={startRoute} replace />} />
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/menu" element={<MainMenu />} />
+        <Route path="/topics" element={<Topics />} />
         <Route path="/topic/:id" element={<TopicScreen />} />
         <Route path="/game/:id/launch" element={<GameLaunch />} />
         <Route path="/game/:id/play" element={<GamePlay />} />

@@ -4,8 +4,8 @@ import { TOPIC_ICONS } from '../icons'
 
 // ── Tab bar ───────────────────────────────────────────────────────────────
 const CHILD_TABS = [
-  { id: 'home',   path: '/menu',         label: 'Темы',    Icon: IcHome   },
-  { id: 'path',   path: '/profile',      label: 'Путь',    Icon: IcMap    },
+  { id: 'home',   path: '/menu',         label: 'Главная', Icon: IcHome   },
+  { id: 'path',   path: '/topics',       label: 'Темы',    Icon: IcMap    },
   { id: 'awards', path: '/achievements', label: 'Награды', Icon: IcTrophy },
   { id: 'me',     path: '/profile',      label: 'Я',       Icon: IcUser   },
 ]
