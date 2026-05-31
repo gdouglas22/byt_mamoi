@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-28T00:00:00.000Z",
+  "model": "manual",
+  "topic": "safe-sites-https",
+  "_doc": "Упор только на протокол: https = безопасно (real), http = небезопасно (fake). Парные сайты: один и тот же домен в обеих ролях, чтобы научить смотреть только на http/https.",
+  "ages": {
+    "easy": {
+      "real": [
+        { "intent": "Хочу зайти в Госуслуги",        "url": "https://gosuslugi.ru",        "reason": "https — соединение зашифровано, никто не подсмотрит твои данные. Замочек в браузере горит." },
+        { "intent": "Хочу зайти в ВКонтакте",        "url": "https://vk.com",              "reason": "https + замочек = безопасно. Можно вводить пароль и логин." },
+        { "intent": "Хочу зайти на Учи.ру",          "url": "https://uchi.ru",             "reason": "https означает что сайт защищён шифрованием. Данные передаются безопасно." },
+        { "intent": "Хочу зайти в Сбербанк-онлайн",  "url": "https://online.sberbank.ru",  "reason": "Банки ВСЕГДА работают только через https. Замочек подтверждает защиту." },
+        { "intent": "Хочу зайти на Roblox",          "url": "https://www.roblox.com",      "reason": "https = безопасно. Никто не перехватит твой пароль по пути." },
+        { "intent": "Хочу зайти на YouTube",         "url": "https://www.youtube.com",     "reason": "https + замочек — сайт настоящий и безопасный, смотри спокойно." },
+        { "intent": "Хочу зайти в почту Mail.ru",    "url": "https://e.mail.ru",           "reason": "Почта без https — это как открытка, прочитать может каждый. Тут https, всё ок." },
+        { "intent": "Хочу зайти на Яндекс",          "url": "https://ya.ru",               "reason": "Поисковики используют https, чтобы скрыть ЧТО ты ищешь от посторонних." }
+      ],
+      "fake": [
+        { "intent": "Хочу зайти в Госуслуги",        "url": "http://gosuslugi.ru",         "reason": "http БЕЗ 's' — нет защиты. Если ввести пароль или паспортные данные — их перехватит любой в той же сети (например в кафе с открытым Wi-Fi)." },
+        { "intent": "Хочу зайти в ВКонтакте",        "url": "http://vk.com",               "reason": "http — соединение открыто. Логин и пароль уйдут к злоумышленнику. Заходить нельзя." },
+        { "intent": "Хочу зайти в Сбербанк-онлайн",  "url": "http://online.sberbank.ru",   "reason": "Банк никогда не работает по http. Если видишь — это либо подделка, либо подмена связи. В любом случае — НЕ ВВОДИТЬ ничего." },
+        { "intent": "Хочу зайти в почту Mail.ru",    "url": "http://e.mail.ru",            "reason": "Почта по http = твои письма читает посторонний. Подмена страницы тоже легко возможна." },
+        { "intent": "Хочу скачать игру",             "url": "http://gamefiles-pack.com",   "reason": "http + неизвестный сайт = большой риск заразить телефон вирусом и потерять пароли." },
+        { "intent": "Хочу зайти в школьный дневник", "url": "http://dnevnik.ru",           "reason": "Школьный сервис должен работать по https. Если адрес начинается с http — что-то не так." },
+        { "intent": "Хочу зайти в Госуслуги школьник","url": "http://schoolregister.gosuslugi.ru", "reason": "Госсайты ВСЕГДА на https. Подмена http — почти всегда мошенничество." },
+        { "intent": "Хочу зайти на Озон",            "url": "http://www.ozon.ru",          "reason": "Магазины работают по https, чтобы защитить данные карты при покупке. http означает что данные карты могут перехватить." }
+      ]
+    },
+    "medium": {
+      "real": [
+        { "intent": "Хочу зайти в Госуслуги",        "url": "https://lk.gosuslugi.ru",      "reason": "https означает шифрование. Поддомен lk на gosuslugi.ru — настоящий личный кабинет." },
+        { "intent": "Хочу зайти на Тинькофф",        "url": "https://www.tbank.ru",         "reason": "Банк работает по https — данные карты в безопасности." },
+        { "intent": "Хочу скачать игру со Steam",    "url": "https://store.steampowered.com","reason": "Steam — только https. Замочек подтверждает что сайт настоящий и защищён." },
+        { "intent": "Хочу зайти на Хабр",            "url": "https://habr.com",             "reason": "https = шифрованная передача, никто не подсмотрит что ты читаешь." },
+        { "intent": "Хочу зайти в Google",           "url": "https://www.google.com",       "reason": "Гугл — только https. Поисковик скрывает что ты ищешь от посторонних в сети." },
+        { "intent": "Хочу зайти в GitHub",           "url": "https://github.com",           "reason": "GitHub только https. Это код проектов — защита соединения обязательна." },
+        { "intent": "Хочу зайти в Telegram",         "url": "https://web.telegram.org",     "reason": "Веб-Телега через https. Сообщения дополнительно шифруются внутри." },
+        { "intent": "Хочу зайти в Wildberries",      "url": "https://www.wildberries.ru",   "reason": "Магазин с покупками — обязательно https, чтобы данные карты не утекли." }
+      ],
+      "fake": [
+        { "intent": "Хочу зайти в Google",           "url": "http://www.google.com",        "reason": "Гугл не работает по http. Если ссылка такая — её подменили в сети. Поисковик защищает запросы — http это уязвимость." },
+        { "intent": "Хочу зайти в Тинькофф",         "url": "http://www.tbank.ru",          "reason": "Банк только https. http означает что либо соединение взломано, либо это подделка. Карта в опасности." },
+        { "intent": "Хочу скачать со Steam",         "url": "http://store.steampowered.com","reason": "Steam настоящий — только https. http значит что между тобой и Steam встрял посредник, который может подменить файлы." },
+        { "intent": "Хочу зайти в GitHub",           "url": "http://github.com",            "reason": "GitHub только https. http — почти всегда подмена в публичной сети, и пароль уйдёт перехватчику." },
+        { "intent": "Хочу зайти в Telegram",         "url": "http://web.telegram.org",      "reason": "Веб-Телега работает только по https. http версии в природе нет — это подделка или атака." },
+        { "intent": "Хочу зайти в Wildberries",      "url": "http://www.wildberries.ru",    "reason": "Магазин без https = твоя карта при покупке передастся открытым текстом. Категорически нельзя." },
+        { "intent": "Хочу зайти на Хабр",            "url": "http://habr.com",              "reason": "Хабр на https. http версия означает что сеть взломана и кто-то её подменяет." },
+        { "intent": "Хочу зайти в личный кабинет налоговой","url": "http://lkfl2.nalog.gov.ru","reason": "Налоговая работает только по https. http — почти 100% подделка или атака на сеть." }
+      ]
+    },
+    "hard": {
+      "real": [
+        { "intent": "Хочу зайти в Reddit",           "url": "https://www.reddit.com/r/cats", "reason": "https с замочком + правильный домен — безопасно, можно читать про котиков." },
+        { "intent": "Хочу зайти в Discord-чат",      "url": "https://discord.com/channels/me","reason": "Discord только https. Сам сайт настоящий, защита включена." },
+        { "intent": "Хочу зайти в почту Гугла",      "url": "https://mail.google.com/mail/u/0/#inbox","reason": "https + поддомен mail на google.com — настоящий Gmail, защищён." },
+        { "intent": "Хочу зайти в Google Документы", "url": "https://docs.google.com",      "reason": "https и официальный поддомен Гугла. Безопасно." },
+        { "intent": "Хочу скачать обновление",       "url": "https://update.microsoft.com", "reason": "Обновления Windows только через https. Иначе кто-то может подсунуть вирус вместо обновления." },
+        { "intent": "Хочу зайти в Стим-инвентарь",   "url": "https://steamcommunity.com/profiles", "reason": "Steam Community — только https. Защита от подмены страницы." },
+        { "intent": "Хочу зайти в школу-олимпиаду",  "url": "https://olymp.hse.ru",         "reason": "Сайт ВУЗа на https — соединение защищено, регистрация безопасна." },
+        { "intent": "Хочу зайти в Microsoft-аккаунт","url": "https://account.microsoft.com","reason": "Microsoft работает только по https. Замочек подтверждает что это настоящий сайт." }
+      ],
+      "fake": [
+        { "intent": "Хочу зайти в Reddit",           "url": "http://www.reddit.com/r/cats", "reason": "Reddit отдаёт только https. http значит что сеть подменена, или это перенаправление на фейк." },
+        { "intent": "Хочу зайти в Discord",          "url": "http://discord.com/channels/me","reason": "Discord только https. http версии нет — это атака посредника или подделка." },
+        { "intent": "Хочу зайти в почту Гугла",      "url": "http://mail.google.com",       "reason": "Gmail работает только через https. http версии не существует — это значит сеть взломана." },
+        { "intent": "Хочу зайти в Google Документы", "url": "http://docs.google.com",       "reason": "Документы через http? Никогда. https обязателен, иначе твои документы прочитает любой." },
+        { "intent": "Хочу скачать обновление",       "url": "http://update.microsoft.com",  "reason": "По http можно подменить файл обновления на вирус. Майкрософт отдаёт только https." },
+        { "intent": "Хочу зайти в Steam-инвентарь",  "url": "http://steamcommunity.com",    "reason": "Steam — только https. http означает что в сети есть подмена, и твой аккаунт могут увести." },
+        { "intent": "Хочу зайти в Microsoft-аккаунт","url": "http://account.microsoft.com", "reason": "Microsoft никогда не отдаёт страницу входа по http. Если адрес такой — это попытка кражи пароля." },
+        { "intent": "Хочу зайти в школу-олимпиаду",  "url": "http://olymp.hse.ru",          "reason": "ВУЗ работает по https. http значит что-то странное — возможно подменили сайт." }
+      ]
+    }
+  }
+}
