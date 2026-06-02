@@ -67,8 +67,17 @@ function refreshDifficultyBadge() {
 refreshDifficultyBadge();
 window.addEventListener("cyberdef:difficulty", refreshDifficultyBadge);
 
+// Difficulty is derived from `user.age` set in the React shell — read-only inside the mini-app.
+// Standalone mode (not iframed) keeps the legacy picker so the app remains usable on its own.
 if (difBadge) {
-  difBadge.addEventListener("click", () => openDifficultyOverlay());
+  if (IS_IFRAMED) {
+    difBadge.setAttribute("disabled", "");
+    difBadge.setAttribute("aria-disabled", "true");
+    difBadge.style.cursor = "default";
+    difBadge.setAttribute("title", "Возраст и сложность настраиваются в профиле приложения");
+  } else {
+    difBadge.addEventListener("click", () => openDifficultyOverlay());
+  }
 }
 
 function openDifficultyOverlay() {
@@ -320,9 +329,13 @@ async function boot() {
     ]);
   } catch { APP_USER = null; APP_TOPICS = []; }
 
-  // Автосложность по возрасту, если игрок не выбирал её вручную
-  if (APP_USER && APP_USER.age && !hasDifficultyChosen()) {
-    setDifficulty(api.autoDifficultyByAge(APP_USER.age));
+  // Возраст — единственный источник истины для сложности (задаётся в профиле React-обёртки).
+  // В iframe-режиме принудительно синхронизируемся с user.age, игнорируя локальный выбор.
+  // Standalone (без iframe) — старое поведение: автосложность только при первом запуске.
+  if (APP_USER && APP_USER.age) {
+    if (IS_IFRAMED || !hasDifficultyChosen()) {
+      setDifficulty(api.autoDifficultyByAge(APP_USER.age));
+    }
   }
   refreshDifficultyBadge();
   refreshHeader();

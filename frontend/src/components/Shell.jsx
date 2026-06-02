@@ -23,7 +23,12 @@ export function TabBar({ active, role = 'child' }) {
   return (
     <nav className="tabbar">
       {items.map(({ id, path, label, Icon }) => (
-        <a key={id} className={active === id ? 'active' : ''} onClick={() => navigate(path)}>
+        <a
+          key={id}
+          className={active === id ? 'active' : ''}
+          data-tour={`tab-${id}`}
+          onClick={() => navigate(path)}
+        >
           <Icon />
           <span>{label}</span>
         </a>

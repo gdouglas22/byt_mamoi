@@ -1,16 +1,49 @@
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Shell, AppHeader, TabBar, LoadingScreen } from '../components/Shell'
+import Tour from '../components/Tour'
 import { IcStar, IcFire, IcBolt } from '../icons'
 import { useApi } from '../hooks/useApi'
 import { getTopics, getMe, getActivityWeek } from '../api'
 
 const WEEK_DAYS = ['П', 'В', 'С', 'Ч', 'П', 'С', 'В']
+const TOUR_KEY = 'cyberdef.tour.home.done'
+
+const TOUR_STEPS = [
+  { target: 'current-topic', title: 'Текущая тема',
+    text: 'Здесь видна твоя следующая тема. Жми, чтобы продолжить или начать новую.' },
+  { target: 'tab-home',     title: 'Главная',
+    text: 'Сюда возвращаешься в любой момент — баллы, серия дней и текущая тема.' },
+  { target: 'tab-play',     title: 'Играть',
+    text: 'Вкладка с играми. Тут открывается Кибер-Академия с курсами и мини-играми.' },
+  { target: 'tab-awards',   title: 'Награды',
+    text: 'Все бейджи: открытые и закрытые. Жми на любой — увидишь, за что он даётся.' },
+  { target: 'tab-me',       title: 'Профиль',
+    text: 'Имя, возраст, тема оформления и привязка к родителю.' },
+]
 
 export default function MainMenu() {
   const navigate = useNavigate()
   const { data: user } = useApi(getMe)
   const { data: topics, loading } = useApi(getTopics)
   const { data: week } = useApi(getActivityWeek)
+
+  const [showTour, setShowTour] = useState(false)
+  useEffect(() => {
+    if (loading) return
+    let done = false
+    try { done = localStorage.getItem(TOUR_KEY) === '1' } catch {}
+    if (!done) {
+      // Wait a frame so layout settles and target elements are measurable.
+      const t = setTimeout(() => setShowTour(true), 120)
+      return () => clearTimeout(t)
+    }
+  }, [loading])
+
+  function finishTour() {
+    try { localStorage.setItem(TOUR_KEY, '1') } catch {}
+    setShowTour(false)
+  }
 
   if (loading) return <LoadingScreen />
 
@@ -57,7 +90,7 @@ export default function MainMenu() {
 
         {/* Current topic */}
         {current && (
-          <div style={{ marginTop: 14 }}>
+          <div style={{ marginTop: 14 }} data-tour="current-topic">
             <div style={{
               borderRadius: 24, padding: 18,
               background: 'linear-gradient(135deg, #FCEFC9, #FCE4A0)',
@@ -113,6 +146,8 @@ export default function MainMenu() {
       </div>
 
       <TabBar active="home" />
+
+      {showTour && <Tour steps={TOUR_STEPS} onDone={finishTour} />}
     </Shell>
   )
 }
