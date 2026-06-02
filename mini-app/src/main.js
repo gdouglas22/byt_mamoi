@@ -44,6 +44,7 @@ const difBadge    = document.getElementById("dif-badge");
 // сигнал «я на корневом меню» — чтобы показать кнопку возврата к React-шеллу.
 // Вне iframe (standalone Telegram) это no-op.
 const IS_IFRAMED = (() => { try { return window.parent && window.parent !== window; } catch { return false; } })();
+if (IS_IFRAMED) document.documentElement.dataset.iframed = "1";
 function notifyParent(type, payload = {}) {
   if (!IS_IFRAMED) return;
   try { window.parent.postMessage(Object.assign({ type }, payload), "*"); } catch {}
@@ -226,6 +227,10 @@ async function openLevel(topic, game) {
         if (fr && typeof fr.stars === "number") stars = Math.max(fr.stars, localStars);
         pointsEarned    = fr?.points_earned || 0;
         newAchievements = fr?.new_achievements || [];
+        // Notify the React shell so it can show a Steam-style achievement toast.
+        for (const a of newAchievements) {
+          notifyParent("cyberdef:achievement", { achievement: a });
+        }
         APP_USER   = await api.me().catch(() => APP_USER);
         APP_TOPICS = await api.topics().catch(() => APP_TOPICS);
       } catch {}

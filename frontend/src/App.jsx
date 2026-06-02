@@ -4,6 +4,7 @@ import { useTelegram } from './hooks/useTelegram'
 import { useTheme } from './hooks/useTheme'
 import { getMe, pingActivity } from './api'
 import { LoadingScreen } from './components/Shell'
+import AchievementToast from './components/AchievementToast'
 
 import Onboarding from './screens/Onboarding'
 import MainMenu from './screens/MainMenu'
@@ -44,6 +45,7 @@ export default function App() {
 
   return (
     <HashRouter>
+      <AchievementToast />
       <Routes>
         <Route path="/" element={<Navigate to={startRoute} replace />} />
         <Route path="/onboarding" element={<Onboarding />} />

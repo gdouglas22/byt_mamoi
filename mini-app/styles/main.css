@@ -84,6 +84,11 @@ h1, h2, h3, .theme-head-name, .mail-appbar-name, .theme-tile-name, .level-row-ti
   padding: 4px 10px;
   border-radius: 999px;
 }
+/* Inside our React shell iframe, the rank chip on the left overlaps with the
+   Telegram back arrow rendered by the host. Hide it — the parent shell already
+   shows the player name on its home screen. */
+:root[data-iframed="1"] #topbar .rank { display: none; }
+:root[data-iframed="1"] #topbar { grid-template-columns: 0 1fr auto; gap: 0; }
 #topbar .score {
   font-size: 13px;
   font-weight: 600;
