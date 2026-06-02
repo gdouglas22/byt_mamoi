@@ -9,6 +9,7 @@ export default function Achievements() {
   const navigate = useNavigate()
   const { data: achievements, loading } = useApi(getAchievements)
   const [filter, setFilter] = useState('all') // all | earned | locked
+  const [open, setOpen] = useState(null)
 
   if (loading) return <LoadingScreen />
 
@@ -57,11 +58,31 @@ export default function Achievements() {
           ))}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginTop: 12, paddingBottom: 96 }}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(96px, 1fr))',
+          gap: 10,
+          marginTop: 12,
+          paddingBottom: 96,
+          width: '100%',
+          minWidth: 0,
+        }}>
           {visible.map((a, i) => {
             const Ic = (TOPIC_ICONS && TOPIC_ICONS[a.icon]) || IcStar
             return (
-              <div key={i} className={`badge${!a.earned ? ' locked' : ''}`} style={{ padding: '14px 6px' }}>
+              <button
+                key={a.id ?? i}
+                type="button"
+                className={`badge${!a.earned ? ' locked' : ''}`}
+                onClick={() => setOpen(a)}
+                style={{
+                  padding: '14px 6px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontFamily: 'inherit',
+                  textAlign: 'center',
+                }}
+              >
                 <div className={`badge-art ${a.tone}`}>
                   <Ic />
                 </div>
@@ -71,12 +92,100 @@ export default function Achievements() {
                     +{a.points_reward}
                   </div>
                 )}
-              </div>
+              </button>
             )
           })}
         </div>
       </div>
+
+      {open && (
+        <AchievementSheet
+          item={open}
+          onClose={() => setOpen(null)}
+        />
+      )}
+
       <TabBar active="awards" />
     </Shell>
+  )
+}
+
+function AchievementSheet({ item, onClose }) {
+  const Ic = (TOPIC_ICONS && TOPIC_ICONS[item.icon]) || IcStar
+  const earnedAt = item.earned_at ? new Date(item.earned_at) : null
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 30,
+        background: 'rgba(0,0,0,.45)',
+        backdropFilter: 'blur(2px)',
+        WebkitBackdropFilter: 'blur(2px)',
+        display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+      }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          width: '100%', maxWidth: 480,
+          background: 'var(--surface)',
+          borderRadius: '24px 24px 0 0',
+          padding: '20px 22px calc(28px + env(safe-area-inset-bottom, 0px))',
+          boxShadow: 'var(--shadow-lg)',
+        }}
+      >
+        <div style={{
+          width: 36, height: 4, borderRadius: 2,
+          background: 'var(--ink-4)', opacity: .35,
+          margin: '-4px auto 14px',
+        }} />
+
+        <div className="col" style={{ alignItems: 'center', gap: 8 }}>
+          <div className={`badge-art ${item.tone}`} style={{
+            width: 84, height: 84, borderRadius: 24,
+            opacity: item.earned ? 1 : 0.45,
+            filter: item.earned ? 'none' : 'grayscale(1)',
+          }}>
+            <Ic size={42} />
+          </div>
+          <div className="h-display h2" style={{ marginTop: 6, textAlign: 'center' }}>
+            {item.name}
+          </div>
+          {item.earned ? (
+            <span className="chip honey lg">
+              <IcStar size={12} /> +{item.points_reward} баллов
+            </span>
+          ) : (
+            <span className="chip lg" style={{ color: 'var(--ink-3)' }}>
+              Ещё не открыта
+            </span>
+          )}
+        </div>
+
+        <div className="card-soft" style={{ marginTop: 14, padding: 14 }}>
+          <div className="eyebrow" style={{ marginBottom: 6 }}>
+            {item.earned ? 'За что получено' : 'Как получить'}
+          </div>
+          <div style={{ fontSize: 14, lineHeight: 1.5, color: 'var(--ink-2)' }}>
+            {item.description || 'Описание появится позже.'}
+          </div>
+        </div>
+
+        {earnedAt && (
+          <div className="muted tiny" style={{ textAlign: 'center', marginTop: 12 }}>
+            Получено · {earnedAt.toLocaleDateString('ru', { day: 'numeric', month: 'long', year: 'numeric' })}
+          </div>
+        )}
+
+        <button
+          type="button"
+          className="btn btn-soft btn-block"
+          style={{ marginTop: 14 }}
+          onClick={onClose}
+        >
+          Закрыть
+        </button>
+      </div>
+    </div>
   )
 }
