@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-28T00:00:00.000Z",
+  "model": "manual",
+  "topic": "safe-sites-urls",
+  "_doc": "Каждый item: { intent, url, reason, fake (служебно — выставляется pool'ом) }. intent — короткий контекст 'куда я хочу зайти', url — что игрок видит в адресной строке.",
+  "ages": {
+    "easy": {
+      "real": [
+        { "intent": "Хочу зайти в школьный дневник",       "url": "https://dnevnik.ru",                          "reason": "Настоящий сайт с защитой (https) и понятным адресом" },
+        { "intent": "Хочу зайти в ВКонтакте",              "url": "https://vk.com",                              "reason": "Это и есть настоящий ВК — короткий адрес и https" },
+        { "intent": "Хочу искать в Яндексе",               "url": "https://ya.ru",                               "reason": "Официальный сокращённый адрес Яндекса" },
+        { "intent": "Хочу зайти в Госуслуги",              "url": "https://gosuslugi.ru",                        "reason": "Государственный портал — официальный адрес, защита включена" },
+        { "intent": "Хочу зайти на Roblox",                "url": "https://www.roblox.com",                      "reason": "Настоящий Roblox живёт здесь" },
+        { "intent": "Хочу зайти на Ютуб",                  "url": "https://www.youtube.com",                     "reason": "Официальный домен YouTube" },
+        { "intent": "Хочу зайти в школьную электронную почту", "url": "https://mail.school.edu.ru",              "reason": "Поддомен на школьном домене, защита есть" },
+        { "intent": "Хочу зайти в Госуслуги школьник",     "url": "https://schoolregister.gosuslugi.ru",         "reason": "Официальный поддомен Госуслуг" }
+      ],
+      "fake": [
+        { "intent": "Хочу зайти на Roblox",                "url": "http://robloxx-free.com",                     "reason": "http без 's' (нет защиты) + лишняя 'x' в названии" },
+        { "intent": "Хочу зайти в ВКонтакте",              "url": "http://vk-login.site",                        "reason": "Любой сайт с 'vk-' в начале и расширением .site — почти всегда подделка" },
+        { "intent": "Хочу зайти в Сбербанк-онлайн",        "url": "http://sber-online.click",                    "reason": "Банки не живут на .click и без https. Защиты нет" },
+        { "intent": "Хочу зайти в Госуслуги",              "url": "http://gosuslugi-update.com",                 "reason": "Госуслуги — только на gosuslugi.ru. Любой другой — подделка" },
+        { "intent": "Хочу зайти на YouTube",               "url": "http://you-tube.win",                         "reason": "Дефис в названии + .win = подделка. Настоящий — youtube.com" },
+        { "intent": "Хочу зайти на Яндекс",                "url": "http://yandex-prizes.ru",                     "reason": "Яндекс не делает призовые сайты на левых доменах" },
+        { "intent": "Хочу зайти в Telegram",               "url": "http://telegram-web.org",                     "reason": "Телега живёт на telegram.org и web.telegram.org, не на 'telegram-web'" },
+        { "intent": "Хочу зайти в школьный дневник",       "url": "http://dnevnik-bonus.ru",                     "reason": "Школьный дневник не раздаёт бонусы. Странный домен и нет https" }
+      ]
+    },
+    "medium": {
+      "real": [
+        { "intent": "Хочу зайти на Wildberries",           "url": "https://www.wildberries.ru",                   "reason": "Официальный домен с https" },
+        { "intent": "Хочу зайти на Озон",                  "url": "https://www.ozon.ru",                          "reason": "Официальный Ozon" },
+        { "intent": "Хочу зайти в почту Mail.ru",          "url": "https://e.mail.ru",                            "reason": "Поддомен e на mail.ru — это родной интерфейс почты Mail.ru" },
+        { "intent": "Хочу зайти в Сбербанк-онлайн",        "url": "https://online.sberbank.ru",                   "reason": "Официальный поддомен Сбера, защита включена" },
+        { "intent": "Хочу проверить домашку на Учи.ру",    "url": "https://uchi.ru",                              "reason": "Официальный детский образовательный сайт" },
+        { "intent": "Хочу зайти на Гитхаб",                "url": "https://github.com",                           "reason": "Официальный GitHub" },
+        { "intent": "Хочу скачать игру со Стима",          "url": "https://store.steampowered.com",               "reason": "Поддомен store на steampowered.com — родной магазин Steam" },
+        { "intent": "Хочу зайти в Тинькофф-онлайн",        "url": "https://www.tbank.ru",                         "reason": "Новый официальный домен Тинькофф (Т-Банк)" }
+      ],
+      "fake": [
+        { "intent": "Хочу зайти на Wildberries",           "url": "https://wildberries.bonus-shop.ru",            "reason": "Wildberries — это поддомен .bonus-shop.ru, а НЕ wildberries.ru. Главный домен здесь bonus-shop.ru, и это подделка" },
+        { "intent": "Хочу зайти на Озон",                  "url": "https://ozon-card-bonus.com",                  "reason": "Озон не делает поддоменов через дефис. И уж тем более не .com — у настоящего Ozon главный домен ozon.ru" },
+        { "intent": "Хочу зайти на Стим",                  "url": "https://steamcommunlty.com",                   "reason": "Опечатка: 'communlty' вместо 'community'. Один из самых частых обманных доменов" },
+        { "intent": "Хочу зайти в Сбербанк-онлайн",        "url": "https://sberbank-online.support",              "reason": "Сбер живёт на sberbank.ru, не на сторонних доменах .support. Дефис — звоночек" },
+        { "intent": "Хочу зайти в почту Mail.ru",          "url": "https://mail-ru-update.com",                   "reason": "Дефисы и .com вместо .ru — типичная подделка. Настоящая почта на mail.ru" },
+        { "intent": "Хочу зайти в Тинькофф",               "url": "https://tinkoff-bank-online.app",              "reason": "Банки не используют .app для входа. Реальный — на tbank.ru / tinkoff.ru" },
+        { "intent": "Хочу зайти на Учи.ру",                "url": "https://uchi-bonus.ru",                        "reason": "Учи.ру не даёт бонусов. Дефис + 'bonus' = типичная мошенническая приманка" },
+        { "intent": "Хочу зайти на YouTube",               "url": "https://youtube-promo.tv",                     "reason": "Любой 'youtube-' с дефисом и не .com — подделка. Настоящий только youtube.com" }
+      ]
+    },
+    "hard": {
+      "real": [
+        { "intent": "Хочу зайти в почту Гугла",            "url": "https://mail.google.com",                      "reason": "Поддомен mail на google.com — настоящая Гугл-почта (Gmail). Защита есть" },
+        { "intent": "Хочу зайти в Google Документы",       "url": "https://docs.google.com",                      "reason": "Поддомен docs на google.com — настоящие Google Docs" },
+        { "intent": "Хочу зайти в Telegram через браузер", "url": "https://web.telegram.org",                     "reason": "Официальный веб-Телеграм. Главный домен telegram.org, поддомен web — родной" },
+        { "intent": "Хочу читать на Хабре",                "url": "https://habr.com",                             "reason": "Хабр живёт на habr.com" },
+        { "intent": "Хочу зайти на Reddit",                "url": "https://www.reddit.com",                       "reason": "Официальный Reddit" },
+        { "intent": "Хочу зайти в личный кабинет налоговой","url": "https://lkfl2.nalog.gov.ru",                  "reason": "Длинный поддомен, но главный домен nalog.gov.ru — официальный налоговой РФ" },
+        { "intent": "Хочу скачать обновление Windows",     "url": "https://update.microsoft.com",                 "reason": "Поддомен update на microsoft.com — родной апдейтер Майкрософт" },
+        { "intent": "Хочу зайти в Discord-чат",            "url": "https://discord.com/channels/me",              "reason": "Discord живёт на discord.com, путь /channels/me — это раздел с друзьями" }
+      ],
+      "fake": [
+        { "intent": "Хочу зайти в Гугл-почту",             "url": "https://google.com-mail.support.click",        "reason": "Главный домен здесь .click, а не google.com. Всё что идёт ДО последней точки перед расширением — обманное прикрытие. Реальный главный домен — справа" },
+        { "intent": "Хочу зайти в Госуслуги",              "url": "https://gosuslugi.ru.update-center.com",       "reason": "Тот же приём: главный домен — update-center.com, а 'gosuslugi.ru' тут — просто часть имени поддомена. Реальные Госуслуги — gosuslugi.ru без всего после .ru" },
+        { "intent": "Хочу зайти в Telegram-web",           "url": "https://web.telegrarn.org",                    "reason": "'telegrarn' вместо 'telegram' — буква r+n вместе выглядит как m. Один из самых тонких приёмов" },
+        { "intent": "Хочу скачать игру со Стима",          "url": "https://steampowered.com.gift-claim.net",      "reason": "Главный домен здесь gift-claim.net, не steampowered.com. Раздач халявных игр там нет" },
+        { "intent": "Хочу зайти на Reddit",                "url": "https://www.rеddit.com",                       "reason": "Буква 'е' в reddit — кириллическая (е), а не латинская (e). Видишь смешение алфавитов — подделка" },
+        { "intent": "Хочу зайти в админку Discord",        "url": "https://discord.com-nitro-free.gift",          "reason": "Главный домен здесь .gift, а не discord.com. Бесплатный Nitro никогда не раздаётся через сторонние сайты" },
+        { "intent": "Хочу зайти в Microsoft-аккаунт",      "url": "https://microsoft.account-recovery.center",    "reason": "Microsoft не делает поддоменов через 'account-recovery'. Главный домен здесь .center — подделка" },
+        { "intent": "Хочу зайти в Хабр",                   "url": "https://habr.com-articles-vip.online",         "reason": "Главный домен здесь .online, а 'habr.com' приклеено как часть имени. Хабр живёт на habr.com и платных VIP-сайтов не имеет" }
+      ]
+    }
+  }
+}

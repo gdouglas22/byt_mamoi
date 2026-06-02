@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f1419" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Russo+One&display=swap" rel="stylesheet" />
+  <title>Кибер-Защитник</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="./styles/main.css" />
+</head>
+<body>
+  <div id="app">
+    <header id="topbar">
+      <div class="rank" id="rank-badge">Новичок</div>
+      <div class="title" id="screen-title">Кибер-Защитник</div>
+      <div class="topbar-right">
+        <button type="button" class="dif-badge" id="dif-badge" aria-label="Сложность">🐯</button>
+        <div class="score" id="total-score">0</div>
+      </div>
+    </header>
+    <main id="screen"></main>
+  </div>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
