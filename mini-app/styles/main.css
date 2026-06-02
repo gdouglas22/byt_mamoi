@@ -86,9 +86,15 @@ h1, h2, h3, .theme-head-name, .mail-appbar-name, .theme-tile-name, .level-row-ti
 }
 /* Inside our React shell iframe, the rank chip on the left overlaps with the
    Telegram back arrow rendered by the host. Hide it — the parent shell already
-   shows the player name on its home screen. */
+   shows the player name on its home screen. Drop the column entirely so the
+   topbar reflows as a two-column grid: title (1fr, left) | controls (auto, right). */
 :root[data-iframed="1"] #topbar .rank { display: none; }
-:root[data-iframed="1"] #topbar { grid-template-columns: 0 1fr auto; gap: 0; }
+:root[data-iframed="1"] #topbar { grid-template-columns: 1fr auto; }
+/* Reserve room on the left for the host-rendered TG back arrow so the title
+   doesn't sit under it on the very first scroll position. */
+:root[data-iframed="1"] #topbar { padding-left: 56px; }
+/* Title is centered visually; left-align inside its column to read naturally. */
+:root[data-iframed="1"] #topbar .title { text-align: left; }
 #topbar .score {
   font-size: 13px;
   font-weight: 600;
