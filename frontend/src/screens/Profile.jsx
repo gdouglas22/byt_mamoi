@@ -3,13 +3,17 @@ import { useNavigate } from 'react-router-dom'
 import { Shell, TabBar, LoadingScreen } from '../components/Shell'
 import {
   IcShield, IcStar, IcMedal, IcSettings,
-  IcUser, IcLink, IcCheck, IcX, IcChevron,
+  IcUser, IcLink, IcCheck, IcX, IcChevron, IcSpark,
 } from '../icons'
 import { useApi } from '../hooks/useApi'
+import { useTheme } from '../hooks/useTheme'
 import { getMe, getAchievements, updateMe } from '../api'
+
+const THEME_LABEL = { system: 'Системная', light: 'Светлая', dark: 'Тёмная' }
 
 export default function Profile() {
   const navigate = useNavigate()
+  const { pref: themePref, setPref: setThemePref } = useTheme()
   const { data: user, loading: lu, reload: reloadUser } = useApi(getMe)
   const { data: achievements, loading: la } = useApi(getAchievements)
 
@@ -167,6 +171,19 @@ export default function Profile() {
               if (editingAge) return
               setAgeDraft(user?.age ? String(user.age) : '')
               setEditingAge(true)
+            }}
+          />
+
+          {/* Theme */}
+          <SettingsRow
+            icon={<IcSpark size={18} />}
+            label="Тема"
+            value={THEME_LABEL[themePref] || 'Системная'}
+            right={<IcChevron size={14} />}
+            onClick={() => {
+              const order = ['system', 'light', 'dark']
+              const next = order[(order.indexOf(themePref) + 1) % order.length]
+              setThemePref(next)
             }}
           />
 

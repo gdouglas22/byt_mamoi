@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useTelegram } from './hooks/useTelegram'
+import { useTheme } from './hooks/useTheme'
 import { getMe, pingActivity } from './api'
 import { LoadingScreen } from './components/Shell'
 
@@ -17,6 +18,7 @@ import {
 
 export default function App() {
   useTelegram()
+  useTheme()
 
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)

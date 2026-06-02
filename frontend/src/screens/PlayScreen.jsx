@@ -42,7 +42,12 @@ export default function PlayScreen() {
         title="Кибер-Академия"
         style={{ flex: 1, width: '100%', border: 'none' }}
         allow="autoplay; fullscreen"
-        onLoad={() => setLoaded(true)}
+        onLoad={() => {
+          setLoaded(true)
+          // Push current theme so the iframe matches the shell immediately.
+          const theme = document.documentElement.dataset.theme || 'dark'
+          try { iframeRef.current?.contentWindow?.postMessage({ type: 'cyberdef:set-theme', theme }, '*') } catch {}
+        }}
       />
       {!loaded && (
         <div style={{

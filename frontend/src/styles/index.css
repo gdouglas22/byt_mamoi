@@ -37,6 +37,39 @@
   --pad: 18px;
 }
 
+/* DARK palette — applied via JS when data-theme="dark".
+   We keep semantic names (--bg, --surface, --ink…) and just remap them. */
+:root[data-theme="dark"] {
+  --bg:           #0F1419;
+  --bg-soft:      #1A2029;
+  --surface:      #232B38;
+  --surface-2:    #1A2029;
+  --primary:      #5B8FD9;
+  --primary-deep: #82B0E8;
+  --primary-soft: rgba(91, 143, 217, 0.20);
+  --primary-50:   rgba(91, 143, 217, 0.10);
+  --border:       rgba(255, 255, 255, 0.10);
+  --line:         rgba(255, 255, 255, 0.06);
+
+  --honey:        #F4C95D;
+  --honey-deep:   #FCDA77;
+  --honey-soft:   rgba(244, 201, 93, 0.18);
+
+  --mint:         #5DD39E;
+  --rose:         #F2A4A4;
+  --lavender:     #B7B2F0;
+  --coral:        #F2A879;
+
+  --ink:          #E8EEF5;
+  --ink-2:        #C2CCDA;
+  --ink-3:        #95A3B3;
+  --ink-4:        #6B7785;
+
+  --shadow-sm:    0 1px 2px rgba(0,0,0,.35), 0 2px 8px rgba(0,0,0,.20);
+  --shadow:       0 2px 4px rgba(0,0,0,.40), 0 8px 24px rgba(0,0,0,.30);
+  --shadow-lg:    0 12px 36px rgba(0,0,0,.50);
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body, #root {

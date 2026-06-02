@@ -1,11 +1,12 @@
 :root {
+  /* DARK palette (default) — matches React shell's dark mode */
   --bg: #0f1419;
   --bg-soft: #1a2029;
   --bg-card: #232b38;
   --text: #e8eef5;
   --text-dim: #95a3b3;
-  --accent: #4aa8ff;
-  --accent-soft: rgba(74, 168, 255, 0.15);
+  --accent: #5B8FD9;
+  --accent-soft: rgba(91, 143, 217, 0.15);
   --success: #5dd39e;
   --warning: #f6b352;
   --danger: #ff6b6b;
@@ -13,6 +14,21 @@
   --radius: 14px;
   --pad: 16px;
   --tap: 48px;
+}
+
+/* LIGHT palette — driven by data-theme="light" set from JS (Telegram colorScheme or user preference). */
+:root[data-theme="light"] {
+  --bg: #EAF2FB;
+  --bg-soft: #F5F9FE;
+  --bg-card: #FFFFFF;
+  --text: #1F3552;
+  --text-dim: #6B82A0;
+  --accent: #3568AE;
+  --accent-soft: rgba(91, 143, 217, 0.18);
+  --success: #2E7E64;
+  --warning: #D9A93A;
+  --danger: #C0392B;
+  --border: rgba(31, 53, 82, 0.10);
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }

@@ -85,9 +85,10 @@ const tg = window.Telegram && window.Telegram.WebApp;
 if (tg) {
   tg.ready();
   tg.expand();
-  applyTheme(tg);
-  tg.onEvent("themeChanged", () => applyTheme(tg));
 }
+// applyTheme handles both standalone (tg present) and iframe (tg null) modes,
+// and sets up its own listeners for theme changes / parent postMessage.
+applyTheme(tg);
 
 let currentBackHandler = null;
 function showBackBtn(handler) {
