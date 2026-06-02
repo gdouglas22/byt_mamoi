@@ -101,36 +101,9 @@ export default function Profile() {
           <div className="bar"><i style={{ width: `${levelPct}%` }} /></div>
         </div>
 
-        {/* Theme — own card above settings, always above the fold */}
-        <div className="eyebrow" style={{ marginTop: 18, marginBottom: 8 }}>Оформление</div>
-        <div className="card" style={{ padding: 14, marginBottom: 16 }}>
-          <div className="row" style={{ gap: 12, alignItems: 'center', marginBottom: 10 }}>
-            <div style={{
-              width: 32, height: 32, borderRadius: 10,
-              background: 'var(--primary-50, #EEF3FB)', color: 'var(--ink-2, #4B5A78)',
-              display: 'grid', placeItems: 'center', flexShrink: 0,
-            }}>
-              <IcSpark size={18} />
-            </div>
-            <div style={{ fontWeight: 700, fontSize: 14, flex: 1 }}>Тема</div>
-          </div>
-          <div className="seg" style={{ display: 'flex', width: '100%' }}>
-            {['system', 'light', 'dark'].map(t => (
-              <button
-                key={t}
-                className={themePref === t ? 'on' : ''}
-                onClick={() => setThemePref(t)}
-                style={{ flex: 1, padding: '8px 6px', fontSize: 12 }}
-              >
-                {THEME_LABEL[t]}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Settings */}
-        <div className="eyebrow" style={{ marginBottom: 8 }}>Настройки</div>
-        <div className="card" style={{ padding: 0, overflow: 'hidden', marginBottom: 80 }}>
+        {/* Settings — appears first so it's always above the fold */}
+        <div className="eyebrow" style={{ marginTop: 18, marginBottom: 8 }}>Настройки</div>
+        <div className="card" style={{ padding: 0, overflow: 'hidden', marginBottom: 16 }}>
           {/* Name */}
           <SettingsRow
             icon={<IcUser size={18} />}
@@ -211,6 +184,33 @@ export default function Profile() {
             onClick={() => { if (!user?.parent_linked) navigate('/parent/link') }}
             last
           />
+        </div>
+
+        {/* Theme — below settings */}
+        <div className="eyebrow" style={{ marginBottom: 8 }}>Оформление</div>
+        <div className="card" style={{ padding: 14, marginBottom: 24 }}>
+          <div className="row" style={{ gap: 12, alignItems: 'center', marginBottom: 10 }}>
+            <div style={{
+              width: 32, height: 32, borderRadius: 10,
+              background: 'var(--primary-50, #EEF3FB)', color: 'var(--ink-2, #4B5A78)',
+              display: 'grid', placeItems: 'center', flexShrink: 0,
+            }}>
+              <IcSpark size={18} />
+            </div>
+            <div style={{ fontWeight: 700, fontSize: 14, flex: 1 }}>Тема</div>
+          </div>
+          <div className="seg" style={{ display: 'flex', width: '100%' }}>
+            {['system', 'light', 'dark'].map(t => (
+              <button
+                key={t}
+                className={themePref === t ? 'on' : ''}
+                onClick={() => setThemePref(t)}
+                style={{ flex: 1, padding: '8px 6px', fontSize: 12 }}
+              >
+                {THEME_LABEL[t]}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
       <TabBar active="me" />
