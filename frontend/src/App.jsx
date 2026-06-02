@@ -6,9 +6,7 @@ import { LoadingScreen } from './components/Shell'
 
 import Onboarding from './screens/Onboarding'
 import MainMenu from './screens/MainMenu'
-import Topics from './screens/Topics'
-import TopicScreen from './screens/TopicScreen'
-import { GameLaunch, GamePlay, GameFinish } from './screens/GameScreens'
+import PlayScreen from './screens/PlayScreen'
 import Profile from './screens/Profile'
 import Achievements from './screens/Achievements'
 import {
@@ -47,11 +45,7 @@ export default function App() {
         <Route path="/" element={<Navigate to={startRoute} replace />} />
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/menu" element={<MainMenu />} />
-        <Route path="/topics" element={<Topics />} />
-        <Route path="/topic/:id" element={<TopicScreen />} />
-        <Route path="/game/:id/launch" element={<GameLaunch />} />
-        <Route path="/game/:id/play" element={<GamePlay />} />
-        <Route path="/game/:id/finish" element={<GameFinish />} />
+        <Route path="/play" element={<PlayScreen />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/achievements" element={<Achievements />} />
         <Route path="/parent/link" element={<ParentLink1 />} />

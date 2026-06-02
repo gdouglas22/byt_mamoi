@@ -1,13 +1,19 @@
-// Клиент к API Фролова: https://bytmamoi-production.up.railway.app
+// Клиент к API Фролова.
+// Когда mini-app хостится на том же домене, что и API (наш Railway-деплой под /games/*),
+// идём напрямую на /api/* — same-origin, никакого CORS. Иначе используем proxy.
 // Авторизация:
-//   - В Telegram WebApp:  Authorization: tma <initData>  (бэк валидирует HMAC-SHA256)
-//   - В dev-браузере:     Authorization: Bearer <token>  (токен из ?token=, localStorage или DEV_TOKEN)
+//   - iframe из родительской React-обёртки: Authorization: tma <initData>
+//     (родитель прокидывает initData через ?tg_init_data= или hash #tg_init_data=)
+//   - Standalone в Telegram:                 Authorization: tma <initData> из window.Telegram.WebApp
+//   - Dev-браузер:                           Authorization: Bearer bm_<key> из ?token= / localStorage
 
-// Всегда идём через same-origin прокси /api/frolov?p=... — снимает CORS и в проде, и в dev.
-//   - На Vercel: api/frolov.js (Edge Function)
-//   - Локально:  scripts/dev-server.py (статика + проксирование /api/frolov)
-// DIRECT_BASE оставлен для отладки (если кто-то явно отключит прокси).
-const USE_PROXY = typeof location !== "undefined" && location.protocol !== "file:";
+// Same-origin detect: если на нашем Railway-домене или на localhost dev-сервера, /api/* доступен напрямую.
+const SAME_ORIGIN_API = (() => {
+  if (typeof location === "undefined") return false;
+  // На любом не-Vercel хосте считаем, что /api/* отдаёт наш бэк (Railway, локальный uvicorn).
+  // На vercel.app остаётся прокси /api/frolov.
+  return !/\.vercel\.app$/i.test(location.hostname);
+})();
 const DIRECT_BASE = "https://bytmamoi-production.up.railway.app";
 const LS_TOKEN_KEY = "cyberdef.api.token";
 
@@ -50,11 +56,29 @@ export function setToken(token) {
   try { token ? localStorage.setItem(LS_TOKEN_KEY, token) : localStorage.removeItem(LS_TOKEN_KEY); } catch {}
 }
 
+function readInitDataFromURL() {
+  // Когда mini-app открыт в iframe внутри нашей React-обёртки,
+  // window.Telegram.WebApp недоступен — родитель прокидывает initData через URL.
+  if (typeof window === "undefined") return "";
+  try {
+    const u = new URL(window.location.href);
+    const qp = u.searchParams.get("tg_init_data");
+    if (qp) return qp;
+    const h = (u.hash || "").replace(/^#/, "");
+    const m = h.match(/(?:^|&)tg_init_data=([^&]+)/);
+    if (m) return decodeURIComponent(m[1]);
+  } catch {}
+  return "";
+}
+
 function buildAuthHeader() {
-  // Приоритет в Telegram: используем initData — бэк сам проверит HMAC и узнает пользователя.
-  const initData = (typeof window !== "undefined" && window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData) || "";
-  if (initData) return "tma " + initData;
-  // Иначе dev-режим: Bearer из URL/localStorage/DEV_TOKEN. В проде DEV_TOKEN = null.
+  // 1) Свой Telegram WebApp (standalone)
+  const tgInit = (typeof window !== "undefined" && window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData) || "";
+  if (tgInit) return "tma " + tgInit;
+  // 2) iframe от родительского React-приложения: initData прокинут через URL
+  const fromUrl = readInitDataFromURL();
+  if (fromUrl) return "tma " + fromUrl;
+  // 3) Dev-режим: Bearer-токен из ?token= / localStorage
   const tok = getToken();
   return tok ? "Bearer " + tok : null;
 }
@@ -63,9 +87,9 @@ async function request(path, opts = {}) {
   const headers = Object.assign({ "Content-Type": "application/json" }, opts.headers || {});
   const auth = buildAuthHeader();
   if (auth) headers["Authorization"] = auth;
-  const url = USE_PROXY
-    ? `${location.origin}/api/frolov?p=${encodeURIComponent(path)}`
-    : DIRECT_BASE + path;
+  const url = SAME_ORIGIN_API
+    ? location.origin + path
+    : `${location.origin}/api/frolov?p=${encodeURIComponent(path)}`;
   const resp = await fetch(url, {
     method: opts.method || "GET",
     headers,

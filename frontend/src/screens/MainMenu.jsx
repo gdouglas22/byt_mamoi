@@ -70,7 +70,7 @@ export default function MainMenu() {
               color: '#5C420C',
               display: 'flex', gap: 14, alignItems: 'center',
               cursor: 'pointer',
-            }} onClick={() => navigate(`/topic/${current.id}`)}>
+            }} onClick={() => navigate('/play')}>
               <div style={{
                 width: 56, height: 56, borderRadius: 18,
                 background: '#fff', color: '#D9A93A',

@@ -53,7 +53,12 @@ async def health() -> dict:
     return {"status": "ok"}
 
 
-# Serve built frontend — must be LAST so API routes take priority
+# Serve colleague's mini-app at /games (must be mounted BEFORE the "/" catch-all)
+_mini_app = Path(__file__).parent.parent / "mini-app"
+if _mini_app.exists():
+    app.mount("/games", StaticFiles(directory=_mini_app, html=True), name="mini_app")
+
+# Serve built React frontend — must be LAST so API routes take priority
 _dist = Path(__file__).parent.parent / "frontend" / "dist"
 if _dist.exists():
     app.mount("/", StaticFiles(directory=_dist, html=True), name="frontend")
