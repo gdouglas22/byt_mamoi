@@ -101,8 +101,35 @@ export default function Profile() {
           <div className="bar"><i style={{ width: `${levelPct}%` }} /></div>
         </div>
 
+        {/* Theme — own card above settings, always above the fold */}
+        <div className="eyebrow" style={{ marginTop: 18, marginBottom: 8 }}>Оформление</div>
+        <div className="card" style={{ padding: 14, marginBottom: 16 }}>
+          <div className="row" style={{ gap: 12, alignItems: 'center', marginBottom: 10 }}>
+            <div style={{
+              width: 32, height: 32, borderRadius: 10,
+              background: 'var(--primary-50, #EEF3FB)', color: 'var(--ink-2, #4B5A78)',
+              display: 'grid', placeItems: 'center', flexShrink: 0,
+            }}>
+              <IcSpark size={18} />
+            </div>
+            <div style={{ fontWeight: 700, fontSize: 14, flex: 1 }}>Тема</div>
+          </div>
+          <div className="seg" style={{ display: 'flex', width: '100%' }}>
+            {['system', 'light', 'dark'].map(t => (
+              <button
+                key={t}
+                className={themePref === t ? 'on' : ''}
+                onClick={() => setThemePref(t)}
+                style={{ flex: 1, padding: '8px 6px', fontSize: 12 }}
+              >
+                {THEME_LABEL[t]}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Settings */}
-        <div className="eyebrow" style={{ marginTop: 18, marginBottom: 8 }}>Настройки</div>
+        <div className="eyebrow" style={{ marginBottom: 8 }}>Настройки</div>
         <div className="card" style={{ padding: 0, overflow: 'hidden', marginBottom: 80 }}>
           {/* Name */}
           <SettingsRow
@@ -172,36 +199,6 @@ export default function Profile() {
               setEditingAge(true)
             }}
           />
-
-          {/* Theme — two-line: label row + full-width segmented control */}
-          <div style={{
-            padding: '12px 14px 14px',
-            borderBottom: '1px solid var(--ink-line, rgba(0,0,0,.06))',
-            display: 'flex', flexDirection: 'column', gap: 10,
-          }}>
-            <div className="row" style={{ gap: 12, alignItems: 'center' }}>
-              <div style={{
-                width: 32, height: 32, borderRadius: 10,
-                background: 'var(--primary-50, #EEF3FB)', color: 'var(--ink-2, #4B5A78)',
-                display: 'grid', placeItems: 'center', flexShrink: 0,
-              }}>
-                <IcSpark size={18} />
-              </div>
-              <div style={{ fontWeight: 700, fontSize: 14, flex: 1 }}>Тема</div>
-            </div>
-            <div className="seg" style={{ display: 'flex', width: '100%' }}>
-              {['system', 'light', 'dark'].map(t => (
-                <button
-                  key={t}
-                  className={themePref === t ? 'on' : ''}
-                  onClick={() => setThemePref(t)}
-                  style={{ flex: 1, padding: '8px 6px', fontSize: 12 }}
-                >
-                  {THEME_LABEL[t]}
-                </button>
-              ))}
-            </div>
-          </div>
 
           {/* Parent link */}
           <SettingsRow
