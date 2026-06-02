@@ -6,7 +6,7 @@ import { TOPIC_ICONS } from '../icons'
 const CHILD_TABS = [
   { id: 'home',   path: '/menu',         label: 'Главная', Icon: IcHome   },
   { id: 'play',   path: '/play',         label: 'Играть',  Icon: IcPlay   },
-  { id: 'awards', path: '/achievements', label: 'Награды', Icon: IcTrophy },
+  { id: 'awards', path: '/achievements', label: 'Бейджи',  Icon: IcTrophy },
   { id: 'me',     path: '/profile',      label: 'Я',       Icon: IcUser   },
 ]
 

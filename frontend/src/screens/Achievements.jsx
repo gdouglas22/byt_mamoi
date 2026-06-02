@@ -22,7 +22,7 @@ export default function Achievements() {
     <Shell>
       <div className="screen-body">
         <div className="row between" style={{ marginTop: 4, alignItems: 'center' }}>
-          <div className="h3">Награды</div>
+          <div className="h3">Бейджи</div>
           <span className="chip lg">{earned.length} из {achievements?.length || 0}</span>
         </div>
 
