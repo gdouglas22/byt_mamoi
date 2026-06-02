@@ -173,26 +173,29 @@ export default function Profile() {
             }}
           />
 
-          {/* Theme — inline segmented control */}
-          <div className="row" style={{
-            padding: '14px 14px', gap: 12, alignItems: 'center',
+          {/* Theme — two-line: label row + full-width segmented control */}
+          <div style={{
+            padding: '12px 14px 14px',
             borderBottom: '1px solid var(--ink-line, rgba(0,0,0,.06))',
+            display: 'flex', flexDirection: 'column', gap: 10,
           }}>
-            <div style={{
-              width: 32, height: 32, borderRadius: 10,
-              background: 'var(--primary-50, #EEF3FB)', color: 'var(--ink-2, #4B5A78)',
-              display: 'grid', placeItems: 'center', flexShrink: 0,
-            }}>
-              <IcSpark size={18} />
+            <div className="row" style={{ gap: 12, alignItems: 'center' }}>
+              <div style={{
+                width: 32, height: 32, borderRadius: 10,
+                background: 'var(--primary-50, #EEF3FB)', color: 'var(--ink-2, #4B5A78)',
+                display: 'grid', placeItems: 'center', flexShrink: 0,
+              }}>
+                <IcSpark size={18} />
+              </div>
+              <div style={{ fontWeight: 700, fontSize: 14, flex: 1 }}>Тема</div>
             </div>
-            <div style={{ fontWeight: 700, fontSize: 14, flex: 1 }}>Тема</div>
-            <div className="seg">
+            <div className="seg" style={{ display: 'flex', width: '100%' }}>
               {['system', 'light', 'dark'].map(t => (
                 <button
                   key={t}
                   className={themePref === t ? 'on' : ''}
                   onClick={() => setThemePref(t)}
-                  style={{ padding: '6px 12px', fontSize: 12 }}
+                  style={{ flex: 1, padding: '8px 6px', fontSize: 12 }}
                 >
                   {THEME_LABEL[t]}
                 </button>
