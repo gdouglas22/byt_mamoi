@@ -182,34 +182,38 @@ export default function Profile() {
               ? <IcCheck size={16} style={{ color: 'var(--mint-deep, #2E7E64)' }} />
               : <IcChevron size={14} />}
             onClick={() => { if (!user?.parent_linked) navigate('/parent/link') }}
-            last
           />
-        </div>
 
-        {/* Theme — below settings */}
-        <div className="eyebrow" style={{ marginBottom: 8 }}>Оформление</div>
-        <div className="card" style={{ padding: 14, marginBottom: 24 }}>
-          <div className="row" style={{ gap: 12, alignItems: 'center', marginBottom: 10 }}>
-            <div style={{
-              width: 32, height: 32, borderRadius: 10,
-              background: 'var(--primary-50, #EEF3FB)', color: 'var(--ink-2, #4B5A78)',
-              display: 'grid', placeItems: 'center', flexShrink: 0,
-            }}>
-              <IcSpark size={18} />
+          {/* Theme — last row in the same Settings card */}
+          <div style={{
+            padding: '14px 14px',
+            display: 'flex', flexDirection: 'column', gap: 10,
+          }}>
+            <div className="row" style={{ gap: 12, alignItems: 'center' }}>
+              <div style={{
+                width: 32, height: 32, borderRadius: 10,
+                background: 'var(--primary-50, #EEF3FB)', color: 'var(--ink-2, #4B5A78)',
+                display: 'grid', placeItems: 'center', flexShrink: 0,
+              }}>
+                <IcSpark size={18} />
+              </div>
+              <div style={{ fontWeight: 700, fontSize: 14, flex: 1 }}>Тема</div>
+              <div className="muted tiny" style={{ fontWeight: 700, color: 'var(--ink-3)' }}>
+                {THEME_LABEL[themePref]}
+              </div>
             </div>
-            <div style={{ fontWeight: 700, fontSize: 14, flex: 1 }}>Тема</div>
-          </div>
-          <div className="seg" style={{ display: 'flex', width: '100%' }}>
-            {['system', 'light', 'dark'].map(t => (
-              <button
-                key={t}
-                className={themePref === t ? 'on' : ''}
-                onClick={() => setThemePref(t)}
-                style={{ flex: 1, padding: '8px 6px', fontSize: 12 }}
-              >
-                {THEME_LABEL[t]}
-              </button>
-            ))}
+            <div className="seg" style={{ display: 'flex', width: '100%' }}>
+              {['system', 'light', 'dark'].map(t => (
+                <button
+                  key={t}
+                  className={themePref === t ? 'on' : ''}
+                  onClick={() => setThemePref(t)}
+                  style={{ flex: 1, padding: '8px 6px', fontSize: 12 }}
+                >
+                  {THEME_LABEL[t]}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
