@@ -1,6 +1,6 @@
 """User profile endpoints."""
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth import TelegramUser, get_telegram_user
 from database import get_db
-from models import GameSession, User, UserAchievement
+from models import GameSession, ParentChild, User, UserAchievement
 from schemas import OkResponse, UserOut, UserUpdate
 
 router = APIRouter(prefix="/me", tags=["users"])
@@ -33,8 +33,40 @@ async def get_or_create_user(tg: TelegramUser, db: AsyncSession) -> User:
 
 
 @router.get("", response_model=UserOut)
-async def get_me(tg: AuthDep, db: DbDep) -> User:
-    return await get_or_create_user(tg, db)
+async def get_me(tg: AuthDep, db: DbDep) -> UserOut:
+    user = await get_or_create_user(tg, db)
+    has_parent = await db.scalar(
+        select(func.count()).select_from(ParentChild).where(ParentChild.child_id == user.id)
+    )
+    out = UserOut.model_validate(user)
+    out.parent_linked = bool(has_parent)
+    return out
+
+
+@router.get("/activity-week")
+async def get_activity_week(tg: AuthDep, db: DbDep) -> dict:
+    """Game-session counts for the last 7 days. Index 0 = Monday, 6 = Sunday."""
+    user = await get_or_create_user(tg, db)
+    today = datetime.now(timezone.utc).date()
+    monday = today - timedelta(days=today.weekday())
+
+    rows = await db.execute(
+        select(
+            func.date(GameSession.completed_at).label("day"),
+            func.count().label("n"),
+        )
+        .where(GameSession.user_id == user.id, GameSession.completed_at >= monday)
+        .group_by(func.date(GameSession.completed_at))
+    )
+    by_day = {row.day: row.n for row in rows}
+
+    counts: list[int] = []
+    for i in range(7):
+        d = monday + timedelta(days=i)
+        # SQLite returns ISO string; PostgreSQL — date. Normalize:
+        key_iso = d.isoformat()
+        counts.append(int(by_day.get(d) or by_day.get(key_iso) or 0))
+    return {"counts": counts, "week_start": monday.isoformat()}
 
 
 @router.patch("", response_model=UserOut)

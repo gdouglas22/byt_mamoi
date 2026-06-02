@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom'
 import { Shell, AppHeader, TabBar, LoadingScreen } from '../components/Shell'
-import { IcStar, IcMedal, IcFire, IcBolt } from '../icons'
+import { IcStar, IcFire, IcBolt } from '../icons'
 import { useApi } from '../hooks/useApi'
-import { getTopics, getMe } from '../api'
+import { getTopics, getMe, getActivityWeek } from '../api'
 
 const WEEK_DAYS = ['П', 'В', 'С', 'Ч', 'П', 'С', 'В']
 
@@ -10,11 +10,11 @@ export default function MainMenu() {
   const navigate = useNavigate()
   const { data: user } = useApi(getMe)
   const { data: topics, loading } = useApi(getTopics)
+  const { data: week } = useApi(getActivityWeek)
 
   if (loading) return <LoadingScreen />
 
-  const doneGames = topics?.reduce((s, t) => s + t.games_done, 0) || 0
-  const streak    = user?.streak_days || 0
+  const streak = user?.streak_days || 0
 
   const list = topics || []
   const inProgress = list.find(t => t.games_done > 0 && t.games_done < t.games_total)
@@ -22,15 +22,18 @@ export default function MainMenu() {
   const current = inProgress || notDone
   const isFresh = current?.games_done === 0
 
-  // TODO: replace with real per-day activity from backend
-  const activity = [35, 60, 0, 80, 95, 40, 25]
+  // Per-day session counts (Mon..Sun), normalized to %-of-max for the chart height.
+  const counts = week?.counts || [0, 0, 0, 0, 0, 0, 0]
+  const peak = Math.max(1, ...counts)
+  const activity = counts.map(c => Math.round((c / peak) * 100))
+  const hasActivity = counts.some(c => c > 0)
 
   return (
     <Shell>
       <AppHeader user={user} onNotifications={() => navigate('/notifications')} />
 
       <div className="screen-body">
-        {/* KPI row */}
+        {/* KPI row — only what isn't duplicated inside the player iframe */}
         <div className="row gap-8">
           <div className="kpi" style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 32, height: 32, borderRadius: 10, background: '#FCEFC9', color: '#D9A93A', display: 'grid', placeItems: 'center' }}>
@@ -42,21 +45,12 @@ export default function MainMenu() {
             </div>
           </div>
           <div className="kpi" style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 32, height: 32, borderRadius: 10, background: '#D6EEE6', color: '#2E7E64', display: 'grid', placeItems: 'center' }}>
-              <IcMedal size={18} />
-            </div>
-            <div>
-              <div className="val">{doneGames}</div>
-              <div className="lbl">игр</div>
-            </div>
-          </div>
-          <div className="kpi" style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 32, height: 32, borderRadius: 10, background: '#DEDBF3', color: '#4F4990', display: 'grid', placeItems: 'center' }}>
               <IcFire size={18} />
             </div>
             <div>
               <div className="val">{streak}</div>
-              <div className="lbl">дня</div>
+              <div className="lbl">дн. подряд</div>
             </div>
           </div>
         </div>
@@ -110,6 +104,11 @@ export default function MainMenu() {
           <div className="row" style={{ justifyContent: 'space-between', fontSize: 10, color: 'var(--ink-4)', fontWeight: 700 }}>
             {WEEK_DAYS.map((d, i) => <span key={i}>{d}</span>)}
           </div>
+          {!hasActivity && (
+            <div className="muted tiny" style={{ textAlign: 'center', marginTop: 8 }}>
+              Пока пусто — начни первую игру, чтобы заполнить неделю
+            </div>
+          )}
         </div>
       </div>
 

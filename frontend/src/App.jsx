@@ -9,6 +9,7 @@ import MainMenu from './screens/MainMenu'
 import PlayScreen from './screens/PlayScreen'
 import Profile from './screens/Profile'
 import Achievements from './screens/Achievements'
+import NotificationsScreen from './screens/Notifications'
 import {
   ParentLink1, ParentLink2, ParentLinkEnter,
   ParentDashboard, ParentNotifications,
@@ -48,6 +49,7 @@ export default function App() {
         <Route path="/play" element={<PlayScreen />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/achievements" element={<Achievements />} />
+        <Route path="/notifications" element={<NotificationsScreen />} />
         <Route path="/parent/link" element={<ParentLink1 />} />
         <Route path="/parent/link/code" element={<ParentLink2 />} />
         <Route path="/parent/link/enter" element={<ParentLinkEnter />} />

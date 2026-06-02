@@ -40,6 +40,15 @@ const rankBadge   = document.getElementById("rank-badge");
 const scoreEl     = document.getElementById("total-score");
 const difBadge    = document.getElementById("dif-badge");
 
+// Когда mini-app встроен в нашу React-обёртку как iframe, родитель ждёт
+// сигнал «я на корневом меню» — чтобы показать кнопку возврата к React-шеллу.
+// Вне iframe (standalone Telegram) это no-op.
+const IS_IFRAMED = (() => { try { return window.parent && window.parent !== window; } catch { return false; } })();
+function notifyParent(type, payload = {}) {
+  if (!IS_IFRAMED) return;
+  try { window.parent.postMessage(Object.assign({ type }, payload), "*"); } catch {}
+}
+
 // ===== Локальный стейт =====
 let APP_USER = null;     // user из API.me()
 let APP_TOPICS = [];     // массив тем из API.topics()
@@ -113,6 +122,7 @@ async function showMenu() {
     try { APP_TOPICS = await api.topics(); } catch { APP_TOPICS = []; }
   }
   screen.replaceChildren(renderMenu(APP_TOPICS, openTopic));
+  notifyParent("cyberdef:at-root", { atRoot: true });
 }
 
 function buildOnboardingScenes() {
@@ -160,6 +170,7 @@ function showThemeView(topic) {
   showBackBtn(showMenu);
   refreshHeader();
   screen.replaceChildren(renderThemeView(topic, (game) => openLevel(topic, game), showMenu));
+  notifyParent("cyberdef:at-root", { atRoot: false });
 }
 
 // ===== Уровень =====

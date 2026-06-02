@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Shell, TabBar, LoadingScreen } from '../components/Shell'
 import {
-  IcShield, IcStar, IcMedal, IcSettings, IcArrowL,
+  IcShield, IcStar, IcMedal, IcSettings,
   IcUser, IcLink, IcCheck, IcX, IcChevron,
 } from '../icons'
 import { useApi } from '../hooks/useApi'
@@ -59,15 +59,8 @@ export default function Profile() {
   return (
     <Shell>
       <div className="screen-body">
-        <div className="row gap-8" style={{ marginTop: 4 }}>
-          <div
-            className="icon-btn"
-            style={{ width: 32, height: 32, boxShadow: 'none', background: 'transparent' }}
-            onClick={() => navigate(-1)}
-          >
-            <IcArrowL size={20} />
-          </div>
-          <div className="grow" />
+        <div className="row between" style={{ marginTop: 4, alignItems: 'center' }}>
+          <div className="h3">Профиль</div>
           <div className="icon-btn"><IcSettings /></div>
         </div>
 
@@ -180,10 +173,12 @@ export default function Profile() {
           {/* Parent link */}
           <SettingsRow
             icon={<IcLink size={18} />}
-            label="Привязать родителя"
-            value=""
-            right={<IcChevron size={14} />}
-            onClick={() => navigate('/parent/link')}
+            label={user?.parent_linked ? 'Родитель' : 'Привязать родителя'}
+            value={user?.parent_linked ? 'Привязан' : ''}
+            right={user?.parent_linked
+              ? <IcCheck size={16} style={{ color: 'var(--mint-deep, #2E7E64)' }} />
+              : <IcChevron size={14} />}
+            onClick={() => { if (!user?.parent_linked) navigate('/parent/link') }}
             last
           />
         </div>

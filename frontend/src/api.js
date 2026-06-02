@@ -29,6 +29,7 @@ export const getMe = () => request('/me')
 export const updateMe = (body) => request('/me', { method: 'PATCH', body: JSON.stringify(body) })
 export const pingActivity = () => request('/me/ping', { method: 'POST' })
 export const getMyStats = () => request('/me/stats')
+export const getActivityWeek = () => request('/me/activity-week')
 
 // ── Topics ─────────────────────────────────────────────────────────────────
 export const getTopics = () => request('/topics')

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Shell, TabBar, LoadingScreen } from '../components/Shell'
-import { IcArrowL, IcTrophy, IcStar, TOPIC_ICONS } from '../icons'
+import { IcTrophy, IcStar, TOPIC_ICONS } from '../icons'
 import { useApi } from '../hooks/useApi'
 import { getAchievements } from '../api'
 
@@ -20,16 +20,8 @@ export default function Achievements() {
   return (
     <Shell>
       <div className="screen-body">
-        <div className="row gap-8" style={{ marginTop: 4, alignItems: 'center' }}>
-          <div
-            className="icon-btn"
-            style={{ width: 32, height: 32, boxShadow: 'none', background: 'transparent' }}
-            onClick={() => navigate(-1)}
-          >
-            <IcArrowL size={20} />
-          </div>
+        <div className="row between" style={{ marginTop: 4, alignItems: 'center' }}>
           <div className="h3">Награды</div>
-          <div className="grow" />
           <span className="chip lg">{earned.length} из {achievements?.length || 0}</span>
         </div>
 
