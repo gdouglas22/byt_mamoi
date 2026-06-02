@@ -85,9 +85,12 @@ export function renderThemeView(topic, onPickGame, onBack) {
   let unlockedNext = true;
   for (let i = 0; i < games.length; i++) {
     const g = games[i];
+    const playable = !!getLevelContent(topic.slug, g.id);
     const locked = !devUnlock && !unlockedNext;
     rows.appendChild(levelRow(g, i, locked, onPickGame));
-    if (!(g.completed || (g.best_stars || 0) > 0)) unlockedNext = false;
+    // Only playable levels gate the chain — "скоро" уровни не должны блокировать
+    // прогрессию навсегда (их пройти нельзя, потому что контента ещё нет).
+    if (playable && !(g.completed || (g.best_stars || 0) > 0)) unlockedNext = false;
   }
   root.appendChild(rows);
 
