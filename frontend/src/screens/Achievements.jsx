@@ -57,25 +57,23 @@ export default function Achievements() {
           ))}
         </div>
 
-        <div className="scroll-fade" style={{ marginTop: 12 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, paddingBottom: 80 }}>
-            {visible.map((a, i) => {
-              const Ic = (TOPIC_ICONS && TOPIC_ICONS[a.icon]) || IcStar
-              return (
-                <div key={i} className={`badge${!a.earned ? ' locked' : ''}`} style={{ padding: '14px 6px' }}>
-                  <div className={`badge-art ${a.tone}`}>
-                    <Ic />
-                  </div>
-                  <div className="badge-name">{a.name}</div>
-                  {a.earned && (
-                    <div className="tiny" style={{ color: 'var(--honey-deep)', fontWeight: 700, marginTop: 2 }}>
-                      +{a.points_reward}
-                    </div>
-                  )}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginTop: 12, paddingBottom: 96 }}>
+          {visible.map((a, i) => {
+            const Ic = (TOPIC_ICONS && TOPIC_ICONS[a.icon]) || IcStar
+            return (
+              <div key={i} className={`badge${!a.earned ? ' locked' : ''}`} style={{ padding: '14px 6px' }}>
+                <div className={`badge-art ${a.tone}`}>
+                  <Ic />
                 </div>
-              )
-            })}
-          </div>
+                <div className="badge-name">{a.name}</div>
+                {a.earned && (
+                  <div className="tiny" style={{ color: 'var(--honey-deep)', fontWeight: 700, marginTop: 2 }}>
+                    +{a.points_reward}
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </div>
       </div>
       <TabBar active="awards" />

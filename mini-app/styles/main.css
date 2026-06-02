@@ -103,6 +103,10 @@ h1, h2, h3, .theme-head-name, .mail-appbar-name, .theme-tile-name, .level-row-ti
   background-attachment: scroll;
   background-position: top center;
 }
+:root[data-theme="light"] #screen {
+  /* The cosmic bg image is dark-only; in light mode use a flat surface instead. */
+  background: var(--bg);
+}
 
 /* ===== Меню тем (одна колонка как у Фролова) ===== */
 .theme-grid { display: flex; flex-direction: column; gap: 10px; }
@@ -258,14 +262,15 @@ h1, h2, h3, .theme-head-name, .mail-appbar-name, .theme-tile-name, .level-row-ti
 .pnc-stub { padding: 24px; text-align: center; color: var(--text-dim); }
 
 .intro {
-  background: linear-gradient(135deg, var(--accent-soft), transparent);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 16px;
   margin-bottom: 16px;
   font-size: 14px;
   line-height: 1.4;
 }
-.intro h2 { margin: 0 0 8px; font-size: 17px; }
+.intro h2 { margin: 0 0 8px; font-size: 17px; color: var(--text); }
 .intro p { margin: 0; color: var(--text-dim); }
 
 .btn {

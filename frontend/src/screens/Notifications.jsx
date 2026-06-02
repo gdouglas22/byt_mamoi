@@ -55,8 +55,7 @@ export default function NotificationsScreen() {
           )}
         </div>
 
-        <div className="scroll-fade" style={{ marginTop: 14 }}>
-          <div className="col gap-14" style={{ paddingBottom: 24 }}>
+        <div className="col gap-14" style={{ marginTop: 14, paddingBottom: 24 }}>
             {groups.length === 0 && (
               <div className="col" style={{ alignItems: 'center', marginTop: 48, gap: 10 }}>
                 <div style={{
@@ -95,7 +94,6 @@ export default function NotificationsScreen() {
                 </div>
               </div>
             ))}
-          </div>
         </div>
       </div>
     </Shell>
