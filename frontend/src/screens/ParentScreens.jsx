@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Shell, TabBar, TopicIcon, LoadingScreen } from '../components/Shell'
 import {
@@ -7,7 +7,7 @@ import {
   IcEye, IcSpark,
 } from '../icons'
 import { useApi } from '../hooks/useApi'
-import { requestLinkCode, confirmLink, getChildren, getChildStats, getNotifications, markAllRead } from '../api'
+import { requestLinkCode, confirmLink, getChildren, getChildStats, getNotifications, markAllRead, getMe } from '../api'
 
 // ── Parent Link Step 1 ────────────────────────────────────────────────────
 export function ParentLink1() {
@@ -240,8 +240,15 @@ export function ParentLinkEnter() {
 // ── Parent Dashboard ──────────────────────────────────────────────────────
 export function ParentDashboard() {
   const navigate = useNavigate()
+  const { data: me } = useApi(getMe)
   const { data: children, loading: lc } = useApi(getChildren)
   const [selectedId, setSelectedId] = useState(null)
+
+  // Если юзер ещё не одобрен (заявка pending или вообще не подавал) — не показываем
+  // дашборд родителя. Это случается, если в HashRouter сохранён URL /parent.
+  useEffect(() => {
+    if (me && !me.is_parent) navigate('/menu', { replace: true })
+  }, [me, navigate])
 
   const childId = selectedId || children?.[0]?.id
   const { data: stats, loading: ls } = useApi(

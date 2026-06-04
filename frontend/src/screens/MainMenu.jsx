@@ -28,6 +28,13 @@ export default function MainMenu() {
   const { data: topics, loading } = useApi(getTopics)
   const { data: week } = useApi(getActivityWeek)
 
+  // Если пользователь стал родителем (привязка одобрена) — он не должен видеть
+  // детский интерфейс. Hash-router помнит последний URL между сессиями, поэтому
+  // после одобрения возможна ситуация: реальный role=parent, а URL остался /menu.
+  useEffect(() => {
+    if (user?.is_parent) navigate('/parent', { replace: true })
+  }, [user?.is_parent, navigate])
+
   const [showTour, setShowTour] = useState(false)
   useEffect(() => {
     if (loading) return
