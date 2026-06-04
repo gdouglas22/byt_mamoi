@@ -1,3 +1,4 @@
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -19,6 +20,18 @@ class Settings(BaseSettings):
 
     # Secret for /admin endpoints (API key management). Empty disables them.
     ADMIN_SECRET: str = ""
+
+    # Comma-separated Telegram user IDs allowed to run admin bot commands
+    # AND to receive parent-link approval notifications.
+    # Example in Railway Variables:  ADMIN_TG_IDS=12345,67890
+    ADMIN_TG_IDS: list[int] = []
+
+    @field_validator("ADMIN_TG_IDS", mode="before")
+    @classmethod
+    def _parse_admin_ids(cls, v):
+        if isinstance(v, str):
+            return [int(x.strip()) for x in v.split(",") if x.strip()]
+        return v
 
 
 settings = Settings()

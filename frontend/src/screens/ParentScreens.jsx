@@ -150,6 +150,7 @@ export function ParentLinkEnter() {
   const [code, setCode] = useState('')
   const [error, setError] = useState(null)
   const [saving, setSaving] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
 
   async function handleConfirm() {
     if (code.length < 6) return
@@ -157,11 +158,38 @@ export function ParentLinkEnter() {
     setError(null)
     try {
       await confirmLink(code)
-      navigate('/parent', { replace: true })
+      setSubmitted(true)
     } catch (e) {
       setError(e.message)
+    } finally {
       setSaving(false)
     }
+  }
+
+  if (submitted) {
+    return (
+      <Shell>
+        <div className="screen-body" style={{ alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: 14, paddingTop: 60 }}>
+          <div style={{
+            width: 84, height: 84, borderRadius: 26,
+            background: 'linear-gradient(135deg, #FCEFC9, #F4C95D)', color: '#5C420C',
+            display: 'grid', placeItems: 'center',
+          }}>
+            <IcMail size={42} />
+          </div>
+          <h2 className="h-display h2">Заявка отправлена</h2>
+          <p className="muted" style={{ margin: '0 16px', fontSize: 14, lineHeight: 1.5 }}>
+            Мы проверим, что это действительно вы (а не одноклассник ребёнка 😅).
+            Когда модератор одобрит — придёт сообщение от бота, и в приложении станет
+            доступен раздел с прогрессом ребёнка.
+          </p>
+          <button className="btn btn-primary btn-block btn-lg" style={{ marginTop: 24, maxWidth: 280 }}
+            onClick={() => navigate('/parent', { replace: true })}>
+            Понятно
+          </button>
+        </div>
+      </Shell>
+    )
   }
 
   return (
@@ -178,6 +206,7 @@ export function ParentLinkEnter() {
           <h2 className="h-display h2">Введите код<br />от ребёнка</h2>
           <p className="muted" style={{ margin: '10px 16px 0', fontSize: 14 }}>
             Ребёнок видит этот код в разделе «Привязка родителя» своего приложения.
+            Заявка пройдёт быструю модерацию.
           </p>
         </div>
 
@@ -200,7 +229,7 @@ export function ParentLinkEnter() {
             disabled={code.length < 6 || saving}
             style={{ opacity: code.length < 6 ? .5 : 1 }}
           >
-            {saving ? 'Проверяем…' : 'Подтвердить'}
+            {saving ? 'Отправляем…' : 'Отправить заявку'}
           </button>
         </div>
       </div>

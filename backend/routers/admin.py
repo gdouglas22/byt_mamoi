@@ -18,7 +18,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from auth import API_KEY_PREFIX, hash_api_key
 from config import settings
 from database import get_db
-from models import ApiKey, User
+from models import ApiKey, ParentLinkRequest, ParentLinkRequestStatus, User
+from routers.parent import approve_parent_link_request, reject_parent_link_request
 
 router = APIRouter(prefix="/admin", tags=["admin"], include_in_schema=False)
 
@@ -113,3 +114,55 @@ async def revoke_api_key(key_id: int, _: AdminDep, db: DbDep) -> dict:
     k.revoked = True
     await db.commit()
     return {"id": key_id, "revoked": True}
+
+
+# ── Parent-link approval queue ────────────────────────────────────────────
+@router.get("/parent-requests")
+async def list_parent_requests(_: AdminDep, db: DbDep, status: str | None = None) -> list[dict]:
+    q = select(ParentLinkRequest).order_by(ParentLinkRequest.created_at.desc())
+    if status:
+        try:
+            q = q.where(ParentLinkRequest.status == ParentLinkRequestStatus(status))
+        except ValueError:
+            raise HTTPException(status_code=400, detail=f"bad status: {status}")
+    rows = (await db.scalars(q)).all()
+    out = []
+    for r in rows:
+        parent = await db.get(User, r.parent_id)
+        child = await db.get(User, r.child_id)
+        out.append({
+            "id": r.id,
+            "status": r.status.value,
+            "parent": {
+                "id": r.parent_id,
+                "name": parent.name if parent else None,
+                "telegram_id": parent.telegram_id if parent else None,
+            },
+            "child": {
+                "id": r.child_id,
+                "name": child.name if child else None,
+                "telegram_id": child.telegram_id if child else None,
+            },
+            "created_at": r.created_at.isoformat() if r.created_at else None,
+            "decided_at": r.decided_at.isoformat() if r.decided_at else None,
+            "decided_by_tg_id": r.decided_by_tg_id,
+        })
+    return out
+
+
+@router.post("/parent-requests/{request_id}/approve")
+async def approve_parent_request(request_id: int, _: AdminDep, db: DbDep) -> dict:
+    # admin_tg_id is unknown here (HTTP admin authenticates via secret, not TG).
+    # Use 0 as a sentinel for "approved via HTTP admin".
+    res = await approve_parent_link_request(request_id, admin_tg_id=0, db=db)
+    if not res.ok:
+        raise HTTPException(status_code=400, detail=res.message)
+    return {"ok": True, "message": res.message}
+
+
+@router.post("/parent-requests/{request_id}/reject")
+async def reject_parent_request(request_id: int, _: AdminDep, db: DbDep) -> dict:
+    res = await reject_parent_link_request(request_id, admin_tg_id=0, db=db)
+    if not res.ok:
+        raise HTTPException(status_code=400, detail=res.message)
+    return {"ok": True, "message": res.message}

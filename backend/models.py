@@ -180,6 +180,30 @@ class LinkCode(Base):
     child: Mapped["User"] = relationship(back_populates="link_codes", foreign_keys=[child_id])
 
 
+class ParentLinkRequestStatus(str, PyEnum):
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+
+
+class ParentLinkRequest(Base):
+    """Created when a parent enters a child's OTP. Admins must approve before
+    the ParentChild link is actually created — this prevents kids from making
+    each other 'parents' for fun."""
+
+    __tablename__ = "parent_link_requests"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    parent_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    child_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    status: Mapped[ParentLinkRequestStatus] = mapped_column(
+        Enum(ParentLinkRequestStatus), default=ParentLinkRequestStatus.PENDING, index=True
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc)
+    decided_at: Mapped[datetime | None] = mapped_column(DateTime)
+    decided_by_tg_id: Mapped[int | None] = mapped_column(Integer)
+
+
 # ── API Keys ───────────────────────────────────────────────────────────────
 class ApiKey(Base):
     """Long-lived API token for external developers."""

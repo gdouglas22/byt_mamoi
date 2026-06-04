@@ -38,8 +38,12 @@ async def get_me(tg: AuthDep, db: DbDep) -> UserOut:
     has_parent = await db.scalar(
         select(func.count()).select_from(ParentChild).where(ParentChild.child_id == user.id)
     )
+    has_children = await db.scalar(
+        select(func.count()).select_from(ParentChild).where(ParentChild.parent_id == user.id)
+    )
     out = UserOut.model_validate(user)
     out.parent_linked = bool(has_parent)
+    out.is_parent = bool(has_children)
     return out
 
 

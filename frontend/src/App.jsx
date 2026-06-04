@@ -41,7 +41,11 @@ export default function App() {
 
   if (loading) return <LoadingScreen />
 
-  const startRoute = !user?.onboarding_done ? '/onboarding' : '/menu'
+  const startRoute = !user?.onboarding_done
+    ? '/onboarding'
+    : user?.is_parent
+      ? '/parent'
+      : '/menu'
 
   return (
     <HashRouter>
