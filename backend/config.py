@@ -1,9 +1,11 @@
-from pydantic import field_validator
+from functools import cached_property
+
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", populate_by_name=True)
 
     BOT_TOKEN: str = "REPLACE_ME"
     MINI_APP_URL: str = "https://example.com"
@@ -22,16 +24,24 @@ class Settings(BaseSettings):
     ADMIN_SECRET: str = ""
 
     # Comma-separated Telegram user IDs allowed to run admin bot commands
-    # AND to receive parent-link approval notifications.
+    # and receive parent-link approval notifications. Stored as a string and
+    # split lazily — pydantic-settings tries to JSON-parse complex fields from
+    # env, which trips on single bare numbers like `12345`.
     # Example in Railway Variables:  ADMIN_TG_IDS=12345,67890
-    ADMIN_TG_IDS: list[int] = []
+    ADMIN_TG_IDS_RAW: str = Field(default="", alias="ADMIN_TG_IDS")
 
-    @field_validator("ADMIN_TG_IDS", mode="before")
-    @classmethod
-    def _parse_admin_ids(cls, v):
-        if isinstance(v, str):
-            return [int(x.strip()) for x in v.split(",") if x.strip()]
-        return v
+    @cached_property
+    def ADMIN_TG_IDS(self) -> list[int]:
+        out: list[int] = []
+        for chunk in (self.ADMIN_TG_IDS_RAW or "").replace(";", ",").split(","):
+            chunk = chunk.strip()
+            if not chunk:
+                continue
+            try:
+                out.append(int(chunk))
+            except ValueError:
+                pass
+        return out
 
 
 settings = Settings()
