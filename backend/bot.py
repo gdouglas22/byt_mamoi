@@ -107,9 +107,9 @@ def _admin_help_text() -> str:
         "/find <code>&lt;tg_id или имя&gt;</code> — найти пользователя\n"
         "/reset <code>&lt;tg_id | all CONFIRM&gt;</code> — обнулить прогресс (профиль остаётся)\n"
         "/reset_full <code>&lt;tg_id | all CONFIRM&gt;</code> — полный сброс + перепрохождение онбординга\n\n"
-        "<b>Заявки на привязку родителя</b>\n"
-        "/requests — список ожидающих заявок\n"
-        "(одобрение/отклонение — кнопками под уведомлением)\n\n"
+        "<b>Привязки родитель ↔ ребёнок</b>\n"
+        "/requests — ожидающие заявки на привязку (кнопки одобрить/отклонить)\n"
+        "/links — все активные привязки (кнопка «разорвать»)\n\n"
         "<b>API-ключи</b>\n"
         "/keys — все API-ключи\n"
         "/grant_key <code>&lt;tg_id&gt; [имя]</code> — выдать ключ\n"
@@ -316,6 +316,39 @@ async def cmd_reset_full(message: Message) -> None:
     )
 
 
+@dp.message(Command("links"))
+async def cmd_links(message: Message) -> None:
+    """List all parent↔child links with inline 'unlink' buttons."""
+    if not await _require_admin(message):
+        return
+    async with SessionLocal() as db:
+        rows = (await db.scalars(
+            select(ParentChild).order_by(ParentChild.linked_at.desc())
+        )).all()
+        if not rows:
+            await message.answer("Привязок «родитель ↔ ребёнок» пока нет.")
+            return
+        await message.answer(
+            f"🔗 <b>Привязки родитель ↔ ребёнок</b> ({len(rows)})",
+            parse_mode="HTML",
+        )
+        for r in rows:
+            parent = await db.get(User, r.parent_id)
+            child  = await db.get(User, r.child_id)
+            linked = r.linked_at.strftime("%d.%m.%Y") if r.linked_at else "—"
+            text = (
+                f"#<code>{r.id}</code> · {linked}\n"
+                f"👨‍👩‍👧 Родитель: <b>{(parent.name or '?') if parent else '?'}</b> "
+                f"(tg=<code>{parent.telegram_id if parent else '?'}</code>)\n"
+                f"🧒 Ребёнок: <b>{(child.name or '?') if child else '?'}</b> "
+                f"(tg=<code>{child.telegram_id if child else '?'}</code>)"
+            )
+            kb = InlineKeyboardMarkup(inline_keyboard=[[
+                InlineKeyboardButton(text="🔓 Разорвать", callback_data=f"pc:unlink:{r.id}"),
+            ]])
+            await message.answer(text, reply_markup=kb, parse_mode="HTML")
+
+
 @dp.message(Command("requests"))
 async def cmd_requests(message: Message) -> None:
     if not await _require_admin(message):
@@ -412,6 +445,56 @@ async def cmd_revoke_key(message: Message) -> None:
     await message.answer(f"Ключ #{key_id} отозван.")
 
 
+# ── Inline callback: unlink an existing ParentChild row ──────────────────
+@dp.callback_query(F.data.startswith("pc:unlink:"))
+async def on_parent_child_unlink(cb: CallbackQuery) -> None:
+    tg_id = cb.from_user.id if cb.from_user else None
+    if not _is_admin(tg_id):
+        await cb.answer("Только админам", show_alert=True)
+        return
+    try:
+        link_id = int((cb.data or "").split(":", 2)[2])
+    except (ValueError, IndexError):
+        await cb.answer("Неверный формат")
+        return
+
+    async with SessionLocal() as db:
+        link = await db.get(ParentChild, link_id)
+        if link is None:
+            await cb.answer(f"Привязка #{link_id} уже удалена", show_alert=False)
+        else:
+            parent = await db.get(User, link.parent_id)
+            child  = await db.get(User, link.child_id)
+            await db.delete(link)
+            await db.commit()
+            # Telegram-уведомление обеим сторонам
+            if parent:
+                from tg_notify import send_to_user as _send
+                await _send(
+                    parent.telegram_id,
+                    "⚠️ Привязка к ребёнку отменена администратором. "
+                    "Если это ошибка — напиши в поддержку: @byt_mamoi_support",
+                )
+            if child:
+                from tg_notify import send_to_user as _send
+                await _send(
+                    child.telegram_id,
+                    "ℹ️ Один из привязанных родителей был отвязан администратором.",
+                )
+            await cb.answer(f"Привязка #{link_id} разорвана", show_alert=False)
+
+    # Сворачиваем кнопки и помечаем сообщение
+    if cb.message:
+        try:
+            await cb.message.edit_text(
+                (cb.message.html_text or cb.message.text or "") + "\n\n<b>🔓 Разорвано</b>",
+                reply_markup=None,
+                parse_mode="HTML",
+            )
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("Failed to edit unlink message: %s", exc)
+
+
 # ── Inline callbacks for parent-link approval ─────────────────────────────
 @dp.callback_query(F.data.startswith("plr:"))
 async def on_parent_link_decision(cb: CallbackQuery) -> None:
@@ -471,6 +554,7 @@ async def set_bot_commands() -> None:
                     BotCommand(command="reset",      description="Обнулить прогресс юзера"),
                     BotCommand(command="reset_full", description="Полный сброс (с онбордингом)"),
                     BotCommand(command="requests",   description="Заявки на привязку"),
+                    BotCommand(command="links",      description="Активные привязки родителей"),
                     BotCommand(command="keys",       description="API-ключи"),
                     BotCommand(command="grant_key",  description="Выдать API-ключ"),
                     BotCommand(command="revoke_key", description="Отозвать API-ключ"),
