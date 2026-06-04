@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Shell } from '../components/Shell'
 import { IcArrow } from '../icons'
-import { updateMe } from '../api'
+import { updateMe, getMe } from '../api'
+import { useApi } from '../hooks/useApi'
 
 // Captain Мяу assets are served by our backend from mini-app/ at /games/*.
 const MENTOR = {
@@ -62,6 +63,17 @@ function SceneShell({ avatar, name = 'Капитан Мяу', text, children, fo
 
 export default function Onboarding() {
   const navigate = useNavigate()
+  const { data: me } = useApi(getMe)
+
+  // Если HashRouter восстановил URL /onboarding, а пользователь уже одобрен как
+  // родитель — никакого детского онбординга. Сразу в родительский дашборд.
+  // Аналогично если онбординг уже пройден — на /menu.
+  useEffect(() => {
+    if (!me) return
+    if (me.is_parent) navigate('/parent', { replace: true })
+    else if (me.onboarding_done) navigate('/menu', { replace: true })
+  }, [me, navigate])
+
   const [step, setStep] = useState(0)
   const [name, setName] = useState('')
   const [age, setAge] = useState(9)

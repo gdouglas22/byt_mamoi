@@ -41,10 +41,12 @@ export default function App() {
 
   if (loading) return <LoadingScreen />
 
-  const startRoute = !user?.onboarding_done
-    ? '/onboarding'
-    : user?.is_parent
-      ? '/parent'
+  // is_parent (одобренная привязка к ребёнку) — главный признак: такие пользователи
+  // никогда не должны видеть детский онбординг, какой бы ни был у них onboarding_done.
+  const startRoute = user?.is_parent
+    ? '/parent'
+    : !user?.onboarding_done
+      ? '/onboarding'
       : '/menu'
 
   return (
