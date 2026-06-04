@@ -105,7 +105,8 @@ def _admin_help_text() -> str:
         "/users — последние пользователи\n"
         "/stats — общая статистика\n"
         "/find <code>&lt;tg_id или имя&gt;</code> — найти пользователя\n"
-        "/reset <code>&lt;tg_id&gt;</code> — обнулить прогресс пользователя\n\n"
+        "/reset <code>&lt;tg_id | all CONFIRM&gt;</code> — обнулить прогресс (профиль остаётся)\n"
+        "/reset_full <code>&lt;tg_id | all CONFIRM&gt;</code> — полный сброс + перепрохождение онбординга\n\n"
         "<b>Заявки на привязку родителя</b>\n"
         "/requests — список ожидающих заявок\n"
         "(одобрение/отклонение — кнопками под уведомлением)\n\n"
@@ -198,29 +199,121 @@ async def cmd_find(message: Message) -> None:
     await message.answer("\n".join(lines), parse_mode="HTML")
 
 
+async def _wipe_progress(user: User, db) -> None:
+    """Reset gameplay state: sessions, achievements, points, streak. Profile stays."""
+    from sqlalchemy import delete
+    await db.execute(delete(GameSession).where(GameSession.user_id == user.id))
+    await db.execute(delete(UserAchievement).where(UserAchievement.user_id == user.id))
+    user.points = 0
+    user.streak_days = 0
+    user.last_active_date = None
+
+
+async def _wipe_profile(user: User, db) -> None:
+    """In addition to progress wipe — force onboarding next time, drop name/age."""
+    await _wipe_progress(user, db)
+    user.onboarding_done = False
+    user.name = None
+    user.age = None
+
+
 @dp.message(Command("reset"))
 async def cmd_reset(message: Message) -> None:
+    """/reset <tg_id> | /reset all CONFIRM — обнулить прогресс (профиль не трогаем)."""
     if not await _require_admin(message):
         return
     parts = (message.text or "").split()
-    if len(parts) < 2 or not parts[1].lstrip("-").isdigit():
-        await message.answer("Использование: /reset &lt;tg_id&gt;", parse_mode="HTML")
+    if len(parts) < 2:
+        await message.answer(
+            "Использование:\n"
+            "  /reset &lt;tg_id&gt; — обнулить прогресс пользователя\n"
+            "  /reset all CONFIRM — обнулить прогресс у ВСЕХ",
+            parse_mode="HTML",
+        )
         return
-    tg_id = int(parts[1])
+
+    target = parts[1].lower()
+    if target == "all":
+        if len(parts) < 3 or parts[2] != "CONFIRM":
+            await message.answer(
+                "⚠️ Опасная операция. Подтверди:\n"
+                "<code>/reset all CONFIRM</code>",
+                parse_mode="HTML",
+            )
+            return
+        async with SessionLocal() as db:
+            users = (await db.scalars(select(User))).all()
+            for u in users:
+                await _wipe_progress(u, db)
+            await db.commit()
+        await message.answer(f"♻️ Прогресс обнулён у {len(users)} пользователей. Профили (имя/возраст) сохранены.")
+        return
+
+    if not target.lstrip("-").isdigit():
+        await message.answer("Использование: /reset &lt;tg_id&gt; или /reset all CONFIRM", parse_mode="HTML")
+        return
+    tg_id = int(target)
     async with SessionLocal() as db:
         user = await db.scalar(select(User).where(User.telegram_id == tg_id))
         if user is None:
             await message.answer(f"Пользователь с tg={tg_id} не найден.")
             return
-        # Wipe progress, keep account.
-        from sqlalchemy import delete
-        await db.execute(delete(GameSession).where(GameSession.user_id == user.id))
-        await db.execute(delete(UserAchievement).where(UserAchievement.user_id == user.id))
-        user.points = 0
-        user.streak_days = 0
-        user.last_active_date = None
+        await _wipe_progress(user, db)
         await db.commit()
-    await message.answer(f"Прогресс пользователя tg={tg_id} обнулён.")
+    await message.answer(f"♻️ Прогресс tg={tg_id} обнулён. Профиль сохранён.")
+
+
+@dp.message(Command("reset_full"))
+async def cmd_reset_full(message: Message) -> None:
+    """/reset_full <tg_id> | /reset_full all CONFIRM — полный сброс: профиль + прогресс, онбординг с нуля."""
+    if not await _require_admin(message):
+        return
+    parts = (message.text or "").split()
+    if len(parts) < 2:
+        await message.answer(
+            "Использование:\n"
+            "  /reset_full &lt;tg_id&gt; — полный сброс пользователя\n"
+            "  /reset_full all CONFIRM — полный сброс у ВСЕХ\n\n"
+            "Сбрасывает: прогресс + имя/возраст + флаг онбординга. "
+            "Пользователь снова пройдёт онбординг при следующем входе.",
+            parse_mode="HTML",
+        )
+        return
+
+    target = parts[1].lower()
+    if target == "all":
+        if len(parts) < 3 or parts[2] != "CONFIRM":
+            await message.answer(
+                "⚠️ Это полностью обнулит всех пользователей. Подтверди:\n"
+                "<code>/reset_full all CONFIRM</code>",
+                parse_mode="HTML",
+            )
+            return
+        async with SessionLocal() as db:
+            users = (await db.scalars(select(User))).all()
+            for u in users:
+                await _wipe_profile(u, db)
+            await db.commit()
+        await message.answer(
+            f"🗑 Полный сброс выполнен для {len(users)} пользователей. "
+            "Все снова пройдут онбординг при следующем входе."
+        )
+        return
+
+    if not target.lstrip("-").isdigit():
+        await message.answer("Использование: /reset_full &lt;tg_id&gt; или /reset_full all CONFIRM", parse_mode="HTML")
+        return
+    tg_id = int(target)
+    async with SessionLocal() as db:
+        user = await db.scalar(select(User).where(User.telegram_id == tg_id))
+        if user is None:
+            await message.answer(f"Пользователь с tg={tg_id} не найден.")
+            return
+        await _wipe_profile(user, db)
+        await db.commit()
+    await message.answer(
+        f"🗑 Полный сброс tg={tg_id}. При следующем входе — онбординг с нуля."
+    )
 
 
 @dp.message(Command("requests"))
@@ -376,6 +469,7 @@ async def set_bot_commands() -> None:
                     BotCommand(command="stats",      description="Общая статистика"),
                     BotCommand(command="find",       description="Найти пользователя"),
                     BotCommand(command="reset",      description="Обнулить прогресс юзера"),
+                    BotCommand(command="reset_full", description="Полный сброс (с онбордингом)"),
                     BotCommand(command="requests",   description="Заявки на привязку"),
                     BotCommand(command="keys",       description="API-ключи"),
                     BotCommand(command="grant_key",  description="Выдать API-ключ"),
