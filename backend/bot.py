@@ -213,6 +213,7 @@ async def _wipe_profile(user: User, db) -> None:
     """In addition to progress wipe — force onboarding next time, drop name/age."""
     await _wipe_progress(user, db)
     user.onboarding_done = False
+    user.tour_home_done = False
     user.name = None
     user.age = None
 

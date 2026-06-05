@@ -26,6 +26,7 @@ class UserOut(BaseModel):
     points: int
     streak_days: int
     onboarding_done: bool
+    tour_home_done: bool = False
     parent_linked: bool = False
     is_parent: bool = False
     created_at: datetime
@@ -39,6 +40,7 @@ class UserUpdate(BaseModel):
     avatar: str | None = Field(None, max_length=32)
     role: UserRole | None = None
     onboarding_done: bool | None = None
+    tour_home_done: bool | None = None
 
 
 # ── Topics ─────────────────────────────────────────────────────────────────

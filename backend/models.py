@@ -54,6 +54,8 @@ class User(Base):
     last_active_date: Mapped[datetime | None] = mapped_column(DateTime)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc)
     onboarding_done: Mapped[bool] = mapped_column(Boolean, default=False)
+    # True once user has dismissed/completed the home-screen spotlight tour.
+    tour_home_done: Mapped[bool] = mapped_column(Boolean, default=False)
 
     sessions: Mapped[list["GameSession"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     user_achievements: Mapped[list["UserAchievement"]] = relationship(back_populates="user", cascade="all, delete-orphan")

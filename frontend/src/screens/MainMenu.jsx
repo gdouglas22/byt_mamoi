@@ -4,10 +4,9 @@ import { Shell, AppHeader, TabBar, LoadingScreen } from '../components/Shell'
 import Tour from '../components/Tour'
 import { IcStar, IcFire, IcBolt } from '../icons'
 import { useApi } from '../hooks/useApi'
-import { getTopics, getMe, getActivityWeek } from '../api'
+import { getTopics, getMe, getActivityWeek, updateMe } from '../api'
 
 const WEEK_DAYS = ['П', 'В', 'С', 'Ч', 'П', 'С', 'В']
-const TOUR_KEY = 'cyberdef.tour.home.done'
 
 const TOUR_STEPS = [
   { target: 'current-topic', title: 'Текущая тема',
@@ -37,19 +36,18 @@ export default function MainMenu() {
 
   const [showTour, setShowTour] = useState(false)
   useEffect(() => {
-    if (loading) return
-    let done = false
-    try { done = localStorage.getItem(TOUR_KEY) === '1' } catch {}
-    if (!done) {
-      // Wait a frame so layout settles and target elements are measurable.
+    // Tour state lives on the server (User.tour_home_done) so it survives
+    // browser switches and resets cleanly via admin /reset_full.
+    if (loading || !user) return
+    if (!user.tour_home_done) {
       const t = setTimeout(() => setShowTour(true), 120)
       return () => clearTimeout(t)
     }
-  }, [loading])
+  }, [loading, user])
 
-  function finishTour() {
-    try { localStorage.setItem(TOUR_KEY, '1') } catch {}
+  async function finishTour() {
     setShowTour(false)
+    try { await updateMe({ tour_home_done: true }) } catch {}
   }
 
   if (loading) return <LoadingScreen />

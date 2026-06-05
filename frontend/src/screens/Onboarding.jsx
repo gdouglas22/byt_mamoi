@@ -85,7 +85,8 @@ export default function Onboarding() {
     if (!trimmedName) return
     setSaving(true)
     try {
-      await updateMe({ name: trimmedName, age, onboarding_done: true })
+      // Завершение онбординга → тур ещё не пройден (флаг живёт на сервере).
+      await updateMe({ name: trimmedName, age, onboarding_done: true, tour_home_done: false })
       navigate('/menu', { replace: true })
     } catch {
       setSaving(false)
