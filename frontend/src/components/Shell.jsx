@@ -12,9 +12,7 @@ const CHILD_TABS = [
 
 const PARENT_TABS = [
   { id: 'home',    path: '/parent',               label: 'Главная',     Icon: IcHome },
-  { id: 'stats',   path: '/parent',               label: 'Прогресс',    Icon: IcMap  },
   { id: 'notes',   path: '/parent/notifications', label: 'Уведомления', Icon: IcBell },
-  { id: 'profile', path: '/parent',               label: 'Профиль',     Icon: IcUser },
 ]
 
 export function TabBar({ active, role = 'child' }) {

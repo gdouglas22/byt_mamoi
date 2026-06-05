@@ -251,63 +251,95 @@ export function ParentDashboard() {
   }, [me, navigate])
 
   const childId = selectedId || children?.[0]?.id
-  const { data: stats, loading: ls } = useApi(
+  const { data: stats } = useApi(
     () => childId ? getChildStats(childId) : Promise.resolve(null),
     [childId]
   )
 
   if (lc) return <LoadingScreen />
 
-  const child = stats?.child || children?.[0]
-
   return (
     <Shell>
       <div className="screen-body">
-        <div className="row between" style={{ marginTop: 6 }}>
-          <div className="col" style={{ gap: 0 }}>
-            <div className="greeting">Добрый день,</div>
-            <div className="name">{child?.name || 'Родитель'}</div>
-          </div>
-          <div className="row gap-8">
-            <div className="icon-btn"><IcSettings /></div>
-            <div className="icon-btn has-dot"><IcBell /></div>
-          </div>
+        <div className="col" style={{ gap: 4, marginTop: 6, marginBottom: 14 }}>
+          <div className="h-display h2">Добрый день,<br />уважаемый родитель!</div>
+          <div className="muted" style={{ fontSize: 14, marginTop: 4 }}>Ваши дети:</div>
         </div>
 
         {children?.length === 0 ? (
-          <div className="card" style={{ marginTop: 20, padding: 24, textAlign: 'center' }}>
-            <div className="muted" style={{ marginBottom: 16 }}>Нет привязанных детей</div>
+          <div className="card" style={{ padding: 24, textAlign: 'center' }}>
+            <div className="muted" style={{ marginBottom: 16 }}>Пока нет привязанных детей</div>
             <button className="btn btn-primary" onClick={() => navigate('/parent/link/enter')}>
               Привязать ребёнка
             </button>
           </div>
         ) : (
           <>
-            {/* Child selector */}
-            <div className="row gap-8" style={{ marginTop: 14 }}>
-              <div className="card row gap-12" style={{ flex: 1, padding: 12, border: '2px solid var(--primary)' }}>
-                <div className="avatar" style={{ width: 40, height: 40, background: '#DBE8F8', color: '#2F5B9A' }}>
-                  <IcShield size={22} />
+            {/* Список детей */}
+            <div className="col gap-8">
+              {children.map(c => {
+                const isActive = c.id === childId
+                return (
+                  <div
+                    key={c.id}
+                    className="card row gap-12"
+                    onClick={() => setSelectedId(c.id)}
+                    style={{
+                      padding: 12,
+                      cursor: 'pointer',
+                      border: isActive ? '2px solid var(--primary)' : '2px solid transparent',
+                    }}
+                  >
+                    <div className="avatar" style={{ width: 40, height: 40, background: '#DBE8F8', color: '#2F5B9A' }}>
+                      <IcShield size={22} />
+                    </div>
+                    <div className="col" style={{ gap: 0, flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 800, fontSize: 14 }}>
+                        {c.name}{c.age ? `, ${c.age} лет` : ''}
+                      </div>
+                      <div className="muted tiny">
+                        {c.points} баллов · {c.streak_days || 0} дн. подряд
+                      </div>
+                    </div>
+                    <IcChevron size={16} style={{ color: 'var(--ink-4)' }} />
+                  </div>
+                )
+              })}
+
+              {/* Добавить ещё одного ребёнка */}
+              <button
+                className="card row gap-12"
+                onClick={() => navigate('/parent/link/enter')}
+                style={{
+                  padding: 12, cursor: 'pointer',
+                  border: '2px dashed var(--border, #DCE6F2)',
+                  background: 'transparent',
+                  width: '100%', textAlign: 'left',
+                  fontFamily: 'inherit', fontSize: 'inherit',
+                  color: 'var(--ink-2)',
+                }}
+              >
+                <div className="avatar" style={{
+                  width: 40, height: 40,
+                  background: 'var(--primary-50, #DCE9F8)', color: 'var(--primary, #5B8FD9)',
+                }}>
+                  <IcPlus size={22} />
                 </div>
                 <div className="col" style={{ gap: 0, flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 800, fontSize: 14 }}>
-                    {child?.name}{child?.age ? `, ${child.age} лет` : ''}
-                  </div>
-                  <div className="muted tiny">
-                    {stats ? `${stats.games_done} игр · ${stats.badges_earned} бейджей` : 'Загружаем…'}
-                  </div>
+                  <div style={{ fontWeight: 700, fontSize: 14 }}>Привязать ещё одного ребёнка</div>
+                  <div className="muted tiny">Введите код от ребёнка</div>
                 </div>
-              </div>
-              <div className="card center" style={{ width: 56, padding: 12, color: 'var(--ink-3)', cursor: 'pointer' }}
-                onClick={() => navigate('/parent/link/enter')}>
-                <IcPlus />
-              </div>
+              </button>
             </div>
 
             {stats && (
               <>
-                {/* Progress card */}
-                <div className="head-stats" style={{ marginTop: 14 }}>
+                {/* Детальная статистика выбранного ребёнка */}
+                <div className="eyebrow" style={{ marginTop: 18, marginBottom: 8 }}>
+                  Прогресс · {stats.child?.name}
+                </div>
+
+                <div className="head-stats">
                   <div className="row between">
                     <div>
                       <div className="label">Общий прогресс</div>
@@ -331,8 +363,7 @@ export function ParentDashboard() {
                   </div>
                 </div>
 
-                {/* KPI row */}
-                <div className="row gap-8" style={{ marginTop: 12 }}>
+                <div className="row gap-8" style={{ marginTop: 12, marginBottom: 24 }}>
                   <div className="kpi" style={{ flex: 1, padding: '10px 12px' }}>
                     <div className="lbl" style={{ fontSize: 10 }}>Время за неделю</div>
                     <div className="val" style={{ fontSize: 18, marginTop: 2 }}>
@@ -343,7 +374,9 @@ export function ParentDashboard() {
                   </div>
                   <div className="kpi" style={{ flex: 1, padding: '10px 12px' }}>
                     <div className="lbl" style={{ fontSize: 10 }}>Серия</div>
-                    <div className="val" style={{ fontSize: 18, marginTop: 2 }}>{child?.streak_days || 0} дня</div>
+                    <div className="val" style={{ fontSize: 18, marginTop: 2 }}>
+                      {stats.child?.streak_days || 0} дн.
+                    </div>
                   </div>
                   <div className="kpi" style={{ flex: 1, padding: '10px 12px' }}>
                     <div className="lbl" style={{ fontSize: 10 }}>Бейджи</div>
