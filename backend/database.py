@@ -29,6 +29,7 @@ async def get_db() -> AsyncSession:  # type: ignore[return]
 # made with the column) and add the column on a pre-existing one.
 _MIGRATIONS: list[str] = [
     "ALTER TABLE users ADD COLUMN tour_home_done BOOLEAN NOT NULL DEFAULT 0",
+    "ALTER TABLE games ADD COLUMN hidden BOOLEAN NOT NULL DEFAULT 0",
 ]
 
 

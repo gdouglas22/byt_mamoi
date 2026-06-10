@@ -103,6 +103,9 @@ class Game(Base):
     difficulty: Mapped[Difficulty] = mapped_column(Enum(Difficulty), default=Difficulty.EASY)
     points_reward: Mapped[int] = mapped_column(Integer, default=30)
     order: Mapped[int] = mapped_column(Integer, default=0)
+    # Soft-delete for legacy games that shouldn't show in UI but whose IDs are
+    # still referenced (e.g. by the mini-app's enrichments map).
+    hidden: Mapped[bool] = mapped_column(Boolean, default=False)
 
     topic: Mapped["Topic"] = relationship(back_populates="games")
     sessions: Mapped[list["GameSession"]] = relationship(back_populates="game", cascade="all, delete-orphan")

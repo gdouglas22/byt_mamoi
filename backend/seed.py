@@ -94,9 +94,13 @@ GAMES_DATA: dict[str, list[dict]] = {
             "order": 1,
         },
         {
+            # Legacy placeholder: переехал в тему «Безопасные сайты» (id=19).
+            # Запись остаётся, чтобы не сдвигались id у последующих игр
+            # (enrichments.js коллеги ждёт стабильные id). Помечается hidden=True
+            # в _normalize_seed → не отображается в UI.
             "title": "Настоящий или фейк?",
             "description": "Сравни сайт банка и его подделку",
-            "instructions": "Два сайта — найди 5 отличий. Отметь всё подозрительное, что указывает на фальшивку.",
+            "instructions": "Перенесена в тему «Безопасные сайты».",
             "duration_mins": 4,
             "difficulty": "easy",
             "points_reward": 40,
@@ -257,10 +261,11 @@ GAMES_DATA: dict[str, list[dict]] = {
             "order": 2,
         },
         {
-            "title": "Доверяй, но проверяй",
-            "description": "Проверь сайт перед покупкой",
-            "instructions": "Тебе нужно купить что-то онлайн. Проверь магазин по чеклисту безопасности.",
-            "duration_mins": 5,
+            # game.id=19 — соответствует enrichments коллеги (Roblox-style фейк-сайт).
+            "title": "Настоящий или фейк?",
+            "description": "Найди признаки подделки на сайте раздачи Робаксов",
+            "instructions": "Друг прислал ссылку на бесплатные робаксы. Сайт открылся — найди все подозрительные элементы.",
+            "duration_mins": 4,
             "difficulty": "hard",
             "points_reward": 65,
             "order": 3,
@@ -449,10 +454,28 @@ async def run_seed(db: AsyncSession) -> None:
             continue
         for gd in games:
             existing_g = await db.scalar(
-                select(Game).where(Game.topic_id == tid, Game.title == gd["title"])
+                select(Game).where(Game.topic_id == tid, Game.order == gd["order"])
             )
             if existing_g is None:
                 db.add(Game(topic_id=tid, **gd))
+            else:
+                # Нормализуем поля у уже существующей записи — так можно безопасно
+                # переименовывать игры в seed без миграций (id сохраняется).
+                for k, v in gd.items():
+                    setattr(existing_g, k, v)
+
+    # Скрываем легаси-игру «Настоящий или фейк?» в теме «Фишинг» — она перенесена
+    # в «Безопасные сайты» (см. enrichments коллеги). Удалить нельзя — поломает
+    # id-нумерацию у последующих игр.
+    phishing_id = topic_map.get("phishing")
+    if phishing_id is not None:
+        legacy = await db.scalar(
+            select(Game).where(
+                Game.topic_id == phishing_id, Game.order == 2,
+            )
+        )
+        if legacy is not None and not legacy.hidden:
+            legacy.hidden = True
 
     # Achievements
     for ad in ACHIEVEMENTS_DATA:

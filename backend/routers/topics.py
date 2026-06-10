@@ -68,7 +68,9 @@ async def list_topics(tg: AuthDep, db: DbDep) -> list[TopicOut]:
     result = []
     for t in topics:
         games = (
-            await db.scalars(select(Game).where(Game.topic_id == t.id))
+            await db.scalars(
+                select(Game).where(Game.topic_id == t.id, Game.hidden == False)  # noqa: E712
+            )
         ).all()
         game_ids = [g.id for g in games]
 
@@ -116,7 +118,7 @@ async def get_topic(topic_id: int, tg: AuthDep, db: DbDep) -> TopicDetailOut:
     games_done = 0
     points_earned = 0
 
-    for g in sorted(t.games, key=lambda x: x.order):
+    for g in sorted([gg for gg in t.games if not gg.hidden], key=lambda x: x.order):
         best = await _user_game_best(user.id, g.id, db)
         pts = await db.scalar(
             select(func.max(GameSession.points_earned)).where(
