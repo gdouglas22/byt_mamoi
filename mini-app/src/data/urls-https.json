@@ -52,7 +52,7 @@
     "hard": {
       "real": [
         { "intent": "Хочу зайти в Reddit",           "url": "https://www.reddit.com/r/cats", "reason": "https с замочком + правильный домен — безопасно, можно читать про котиков." },
-        { "intent": "Хочу зайти в Discord-чат",      "url": "https://discord.com/channels/me","reason": "Discord только https. Сам сайт настоящий, защита включена." },
+        { "intent": "Хочу зайти в Steam",      "url": "https://steamcommunity.com/my/friends","reason": "Steam только https. Сам сайт настоящий, защита включена." },
         { "intent": "Хочу зайти в почту Гугла",      "url": "https://mail.google.com/mail/u/0/#inbox","reason": "https + поддомен mail на google.com — настоящий Gmail, защищён." },
         { "intent": "Хочу зайти в Google Документы", "url": "https://docs.google.com",      "reason": "https и официальный поддомен Гугла. Безопасно." },
         { "intent": "Хочу скачать обновление",       "url": "https://update.microsoft.com", "reason": "Обновления Windows только через https. Иначе кто-то может подсунуть вирус вместо обновления." },
@@ -62,7 +62,7 @@
       ],
       "fake": [
         { "intent": "Хочу зайти в Reddit",           "url": "http://www.reddit.com/r/cats", "reason": "Reddit отдаёт только https. http значит что сеть подменена, или это перенаправление на фейк." },
-        { "intent": "Хочу зайти в Discord",          "url": "http://discord.com/channels/me","reason": "Discord только https. http версии нет — это атака посредника или подделка." },
+        { "intent": "Хочу зайти в Steam",          "url": "http://steamcommunity.com/my/friends","reason": "Steam только https. http версии нет — это атака посредника или подделка." },
         { "intent": "Хочу зайти в почту Гугла",      "url": "http://mail.google.com",       "reason": "Gmail работает только через https. http версии не существует — это значит сеть взломана." },
         { "intent": "Хочу зайти в Google Документы", "url": "http://docs.google.com",       "reason": "Документы через http? Никогда. https обязателен, иначе твои документы прочитает любой." },
         { "intent": "Хочу скачать обновление",       "url": "http://update.microsoft.com",  "reason": "По http можно подменить файл обновления на вирус. Майкрософт отдаёт только https." },

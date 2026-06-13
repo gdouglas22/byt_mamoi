@@ -58,7 +58,7 @@
         { "intent": "Хочу зайти на Reddit",                "url": "https://www.reddit.com",                       "reason": "Официальный Reddit" },
         { "intent": "Хочу зайти в личный кабинет налоговой","url": "https://lkfl2.nalog.gov.ru",                  "reason": "Длинный поддомен, но главный домен nalog.gov.ru — официальный налоговой РФ" },
         { "intent": "Хочу скачать обновление Windows",     "url": "https://update.microsoft.com",                 "reason": "Поддомен update на microsoft.com — родной апдейтер Майкрософт" },
-        { "intent": "Хочу зайти в Discord-чат",            "url": "https://discord.com/channels/me",              "reason": "Discord живёт на discord.com, путь /channels/me — это раздел с друзьями" }
+        { "intent": "Хочу зайти в Steam",            "url": "https://steamcommunity.com/my/friends",              "reason": "Steam живёт на steamcommunity.com, путь /my/friends — это раздел с друзьями" }
       ],
       "fake": [
         { "intent": "Хочу зайти в Гугл-почту",             "url": "https://google.com-mail.support.click",        "reason": "Главный домен здесь .click, а не google.com. Всё что идёт ДО последней точки перед расширением — обманное прикрытие. Реальный главный домен — справа" },
@@ -66,7 +66,7 @@
         { "intent": "Хочу зайти в Telegram-web",           "url": "https://web.telegrarn.org",                    "reason": "'telegrarn' вместо 'telegram' — буква r+n вместе выглядит как m. Один из самых тонких приёмов" },
         { "intent": "Хочу скачать игру со Стима",          "url": "https://steampowered.com.gift-claim.net",      "reason": "Главный домен здесь gift-claim.net, не steampowered.com. Раздач халявных игр там нет" },
         { "intent": "Хочу зайти на Reddit",                "url": "https://www.rеddit.com",                       "reason": "Буква 'е' в reddit — кириллическая (е), а не латинская (e). Видишь смешение алфавитов — подделка" },
-        { "intent": "Хочу зайти в админку Discord",        "url": "https://discord.com-nitro-free.gift",          "reason": "Главный домен здесь .gift, а не discord.com. Бесплатный Nitro никогда не раздаётся через сторонние сайты" },
+        { "intent": "Хочу забрать бесплатные скины Steam",        "url": "https://steamcommunity.com-free-skins.gift",          "reason": "Главный домен здесь .gift, а не steamcommunity.com. Бесплатные скины никогда не раздаются через сторонние сайты" },
         { "intent": "Хочу зайти в Microsoft-аккаунт",      "url": "https://microsoft.account-recovery.center",    "reason": "Microsoft не делает поддоменов через 'account-recovery'. Главный домен здесь .center — подделка" },
         { "intent": "Хочу зайти в Хабр",                   "url": "https://habr.com-articles-vip.online",         "reason": "Главный домен здесь .online, а 'habr.com' приклеено как часть имени. Хабр живёт на habr.com и платных VIP-сайтов не имеет" }
       ]
